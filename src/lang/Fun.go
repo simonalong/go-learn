@@ -53,3 +53,8 @@ func fun4(callback CallBack) {
 	result := callback(1)
 	println(result)
 }
+
+func fun5(callback CallBack) {
+	result := callback(1)
+	println(result)
+}
