@@ -10,6 +10,7 @@ func main() {
 	arrayInit()
 	arrayFor()
 	arrayTest2()
+	test()
 }
 
 func showArray1() {
@@ -73,5 +74,75 @@ func arrayTest2() {
 
 	println(len(a))
 	println(cap(a))
+}
 
+func test() {
+	fmt.Println("======================== slice ========================")
+	//切片初始化，其实也就是不指定具体大小的都可以称之为切片
+	//
+	//
+	//s := []int{1,2,4}
+	//fmt.Println(s)
+	//
+	////新的切片
+	//ss:= s[:]
+	//fmt.Println(ss)
+	//
+	////创建切片
+	//sss := s[0:1]
+	//fmt.Println(sss)
+	//
+	////创建切片
+	//s1 := s[:2]
+	//fmt.Println(s1)
+	//
+	////创建切片
+	//s2 := s[1:]
+	//fmt.Println(s2)
+	//
+	////创建切片，通过内置函数make进行初始化切片s，指定的是int类型
+	//s3 := make([]int, 2, 12)
+	//fmt.Println(s3)
+	//fmt.Println(s3)
+	//
+	////系统内置函数len和cap 这两个函数是用于计算切片的当前长度和容量
+	//fmt.Println(len(s3), cap(s3))
+	//
+	////模拟切片超过容量情况
+	//s4 := make([]int, 2,2)
+	//fmt.Println(cap(s4))
+	//ints := append(s4, 2)
+	//fmt.Println(s4)
+	//fmt.Println(ints)
+	//fmt.Println(cap(s4))
+	//
+	////切片在未初始化之前是空的是nil
+	//var numbers []int
+	//if numbers == nil{
+	//	fmt.Println("空")
+	//}else{
+	//	fmt.Println(numbers)
+	//}
+	//
+	//切片的append函数，可以增加多个元素
+	var nums []int
+	nums = append(nums, 0)
+	nums = append(nums, 1)
+	nums = append(nums, 1, 2, 3, 2)
+	fmt.Println(nums)
+	//
+	////创建新的切片，但是这个里面是没有数据的
+	//nums2 := make([]int, len(nums), cap(nums))
+	//fmt.Println(nums2, len(nums2), cap(nums2))
+	//
+	////切片的copy函数，拷贝内容到nums中
+	//copy(nums2, nums)
+	//fmt.Println(nums2)
+
+	// 这个算是数组
+	ss := []int{}[:]
+	ss = append(ss, 1)
+	ss = append(ss, 2)
+	ss = append(ss, 3)
+	fmt.Println(ss)
 }
