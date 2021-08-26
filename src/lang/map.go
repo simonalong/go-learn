@@ -11,6 +11,7 @@ func main() {
 func mapShow1() {
 	fmt.Println("==================== ++ ====================")
 
+	// 定义map结构：key:string, value: string
 	var a = map[string]string{}
 
 	a["a"] = "a1"
