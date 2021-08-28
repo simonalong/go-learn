@@ -20,6 +20,7 @@ func controller(t *gin.Engine) {
 	r.GET(base_api+"/get1", get1)
 	//r.Handle("get", base_api+"/get11", get1)
 	r.GET(base_api+"/get2", get2)
+	r.GET(base_api+"/get3", get3)
 	r.GET(base_api+"/json/ascii", someJson)
 	r.GET(base_api+"/jsonP", jsonP)
 	r.POST(base_api+"/login", login1)
@@ -39,6 +40,13 @@ func get2(c *gin.Context) {
 	result["b"] = "ok2"
 
 	c.JSON(http.StatusOK, result)
+}
+
+// 返回值
+func get3(c *gin.Context) {
+	// {"message":"pong"}
+
+	c.JSON(http.StatusOK, 1)
 }
 
 func someJson(c *gin.Context) {

@@ -4,15 +4,15 @@ import "fmt"
 
 func main() {
 
-	show(1, 2, 3)
+	Show(1, 2, 3)
 
 	datas := []int{3, 4, 5, 6, 7}
-	show(datas...)
+	Show(datas...)
 
 	objects := make([]int, len(datas))
-	show(objects...)
+	Show(objects...)
 }
 
-func show(ary ...int) {
+func Show(ary ...int) {
 	fmt.Println(ary)
 }

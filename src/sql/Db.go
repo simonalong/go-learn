@@ -34,11 +34,11 @@ func main() {
 	truncate()
 	db.ShowSQL(true)
 
-	insert()
+	//insert()
 	//save()
 	//delete()
 	//update()
-	//one()
+	one()
 	//one2()
 	//one3()
 	//list()
@@ -113,6 +113,8 @@ func update() {
 
 func one() {
 	println("============ 测试 one ============")
+	db.Insert(&NeoTable1{Name: "update_name", Group: "update_group"})
+
 	data := NeoTable1{}
 	get, err := db.Where("`name`=? and `group`=?", "update_name", "update_group").Get(&data)
 	if err != nil {

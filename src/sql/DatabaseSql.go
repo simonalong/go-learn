@@ -7,6 +7,8 @@ import (
 	"log"
 )
 
+type NeoMap map[string]interface{}
+
 func getDb() (*sql.DB, error) {
 	url := "neo_test:neo@Test123@tcp(localhost:3306)/neo?charset=utf8"
 	db, err := sql.Open("mysql", url)
@@ -38,6 +40,7 @@ func main() {
 	//sqlCount();
 	//sqlExist();
 
+	execute1()
 	exe2()
 }
 
@@ -90,6 +93,50 @@ func execute(rows *sql.Rows) {
 		}
 	}
 	//fmt.Println(result)
+}
+
+func execute1() (NeoMap, error) {
+	db, _ := getDb()
+	//rows, _:= db.Query("select `name`, `group` from neo_table1")
+	stmt, _ := db.Prepare("select `name`, `group`, `id` from neo_table1 where id = ?")
+	rows, _ := stmt.Query("1")
+	columns, _ := rows.Columns()
+	columnsLength := len(columns)
+	nums := make([]interface{}, columnsLength)
+	point := make([]interface{}, columnsLength)
+	for i := range nums {
+		point[i] = &nums[i]
+	}
+	result := make(map[string]interface{})
+	for rows.Next() {
+		var id int
+		var name string
+		var group string
+		err := rows.Scan(point...)
+		//err := rows.Scan(&name, &group, &id)
+		if err != nil {
+			log.Fatal(err)
+			return nil, nil
+		}
+		//for i := range nums {
+		//	//fmt.Println("=====", reflect.TypeOf(point[i]))
+		//	//fmt.Println("=====", reflect.ValueOf(point[i]))
+		//	//fmt.Println("=====", reflect.ValueOf(nums[i]))
+		//	//fmt.Println("=====", reflect.Indirect(reflect.ValueOf(point[i])))
+		//	//fmt.Println("=====", reflect.Indirect(reflect.ValueOf(nums[i])))
+		//	//fmt.Println("=====", reflect.ValueOf(nums[i]))
+		//
+		//	result[columns[i]] = fmt.Sprintf("%s", nums[i])
+		//}
+
+		fmt.Println("数据：")
+		fmt.Println(id)
+		fmt.Println(name)
+		fmt.Println(group)
+	}
+
+	fmt.Println(result)
+	return result, nil
 }
 
 func exe2() {
