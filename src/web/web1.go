@@ -45,8 +45,6 @@ func get2(c *gin.Context) {
 // 返回值
 func get3(c *gin.Context) {
 	// {"message":"pong"}
-
-	c.JSON(http.StatusOK, 1)
 }
 
 func someJson(c *gin.Context) {
