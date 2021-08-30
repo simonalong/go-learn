@@ -1,5 +1,5 @@
 package main
 
 type demo struct {
-	name string `form:"name" binding:"required"`
+	name string `form:"Name" binding:"required"`
 }

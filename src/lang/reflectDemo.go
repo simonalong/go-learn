@@ -6,28 +6,28 @@ import (
 )
 
 type ClsDemo struct {
-	name string
-	age  int
+	Name string
+	Age  int
 }
 
 func (c ClsDemo) Fun11(name string) {
-	c.name = name
+	c.Name = name
 }
 
 func (c ClsDemo) Fun21(age int) {
-	c.age = age
+	c.Age = age
 }
 
 func (c *ClsDemo) Fun1(name string) {
-	c.name = name
+	c.Name = name
 }
 
 func (c *ClsDemo) Fun2(age int) {
-	c.age = age
+	c.Age = age
 }
 
 func main() {
-	cls := ClsDemo{name: "name"}
+	cls := ClsDemo{Name: "Name"}
 	//cls.Fun1("chg")
 
 	// 显示带*的，也显示不带星号的
@@ -42,7 +42,9 @@ func main() {
 	//Fun21 func(main.ClsDemo, int)
 	method(cls)
 
-	fmt.Printf(cls.name)
+	fmt.Printf(cls.Name)
+
+	element()
 }
 
 func method(obj interface{}) {
@@ -51,7 +53,7 @@ func method(obj interface{}) {
 	for i := 0; i < objType.NumMethod(); i++ {
 		method := objType.Method(i)
 		fmt.Println("index = ", method.Index)
-		fmt.Println("name = ", method.Name)
+		fmt.Println("Name = ", method.Name)
 		fmt.Println("type = ", method.Type)
 		fmt.Println("pkgPath = ", method.PkgPath)
 		fmt.Println("func = ", method.Func)
@@ -95,12 +97,12 @@ func showType(ary ...interface{}) {
 
 func test3() {
 	// ======= 普通占位符 =======
-	data1 := ClsDemo{name: "nihao", age: 32}
+	data1 := ClsDemo{Name: "nihao", Age: 32}
 	// {nihao 32}
 	fmt.Printf("v = %v\n", data1)
-	// {name:nihao age:32}
+	// {Name:nihao Age:32}
 	fmt.Printf("+v = %+v\n", data1)
-	//  main.ClsDemo{name:"nihao", age:32}
+	//  main.ClsDemo{Name:"nihao", Age:32}
 	fmt.Printf("#v = %#v\n", data1)
 	// main.ClsDemo
 	fmt.Printf("T = %T\n", data1)
@@ -113,13 +115,13 @@ func test3() {
 
 	// ======= 整数占位符 =======
 	// 二进制：100000
-	fmt.Printf("b = %b\n", data1.age)
+	fmt.Printf("b = %b\n", data1.Age)
 	// Unicode码点表示字符
 	fmt.Printf("c = %c\n", 0x4E2D)
 	// 十进制 32
-	fmt.Printf("d = %d\n", data1.age)
+	fmt.Printf("d = %d\n", data1.Age)
 	// 八进制 40
-	fmt.Printf("o = %o\n", data1.age)
+	fmt.Printf("o = %o\n", data1.Age)
 	// 单引号围绕的Unicode码
 	fmt.Printf("q = %q\n", 0x4E2D)
 	// 十六进制，小写a~f，ff
@@ -127,5 +129,31 @@ func test3() {
 	// 十六进制，大写a~f，FF
 	fmt.Printf("X = %X\n", 255)
 	// Unicode格式，U+0020
-	fmt.Printf("U = %U\n", data1.age)
+	fmt.Printf("U = %U\n", data1.Age)
+}
+
+func element() {
+	fmt.Println("===== element =====")
+	//demo := ClsDemo{}
+	//demo.Name = "sdf"
+	//
+	//demoType := reflect.TypeOf(demo)
+	//demoType.Elem()
+
+	// 声明一个空结构体
+	type cat struct {
+	}
+	// 创建cat的实例
+	ins := &cat{}
+	// 获取结构体实例的反射类型对象
+	typeOfCat := reflect.TypeOf(ins)
+	// 显示反射类型对象的名称和种类
+	// name:'' kind:'ptr'
+	fmt.Printf("name:'%s' kind:'%s'\n", typeOfCat.Name(), typeOfCat.Kind())
+	// 取类型的元素
+	typeOfCat = typeOfCat.Elem()
+	// 显示反射类型对象的名称和种类
+	// element name: 'cat', element kind: 'struct'
+	fmt.Printf("element name: '%v', element kind: '%v'\n", typeOfCat.Name(), typeOfCat.Kind())
+
 }

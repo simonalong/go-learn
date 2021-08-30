@@ -1,11 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 func main() {
 
 	mapShow1()
 	mapShow2()
+	mapShow3()
+	mapPertty()
 }
 
 func mapShow1() {
@@ -60,5 +65,38 @@ func mapShow2() {
 
 	value2 = a["c"]
 	fmt.Println(value2)
+}
 
+func mapShow3() {
+	var dataMap = make(map[string]map[string][]int)
+
+	var innerMap1 = make(map[string][]int)
+	innerMap1["inner_a"] = []int{2, 3, 4, 5, 435}
+	innerMap1["inner_b"] = []int{2, 3, 4, 5, 435}
+	innerMap1["inner_c"] = []int{2, 3, 4, 5, 435}
+	dataMap["inner1"] = innerMap1
+
+	var innerMap2 = make(map[string][]int)
+	innerMap2["inner_a"] = []int{2, 3, 4, 5, 435}
+	innerMap2["inner_b"] = []int{2, 3, 4, 5, 435}
+	innerMap2["inner_c"] = []int{2, 3, 4, 5, 435}
+	dataMap["inner2"] = innerMap2
+
+	mjson, _ := json.Marshal(dataMap)
+	fmt.Println(string(mjson))
+
+	mjson2, _ := json.MarshalIndent(dataMap, "", "\t")
+	fmt.Println(string(mjson2))
+}
+
+func mapPertty() {
+	var dataMap = make(map[string]string)
+	dataMap["nihao"] = "hello"
+	dataMap["nihaoguodoush"] = "word"
+	dataMap["shuia"] = "ok"
+	dataMap["zhong"] = "haode"
+
+	// json美化
+	bytes, _ := json.MarshalIndent(dataMap, "", "\t")
+	fmt.Println(string(bytes))
 }
