@@ -28,6 +28,9 @@ func (c *ClsDemo) Fun2(age int) {
 
 func main() {
 	cls := ClsDemo{Name: "Name"}
+	objValue := reflect.ValueOf(cls)
+	fmt.Printf("%v", objValue.Interface())
+	fmt.Println("=======")
 	//cls.Fun1("chg")
 
 	// 显示带*的，也显示不带星号的
