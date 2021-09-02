@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 )
@@ -27,27 +28,48 @@ func (c *ClsDemo) Fun2(age int) {
 }
 
 func main() {
-	cls := ClsDemo{Name: "Name"}
+	cls := ClsDemo{Name: "zhou"}
 	objValue := reflect.ValueOf(cls)
-	fmt.Printf("%v", objValue.Interface())
-	fmt.Println("=======")
-	//cls.Fun1("chg")
+	//objType := reflect.TypeOf(cls)
+	fieldValue := objValue.FieldByName("Name")
 
-	// 显示带*的，也显示不带星号的
-	//Fun1 func(*main.ClsDemo, string)
-	//Fun11 func(*main.ClsDemo, string)
-	//Fun2 func(*main.ClsDemo, int)
-	//Fun21 func(*main.ClsDemo, int)
-	method(&cls)
-	fmt.Println("=======")
-	// 只显示不带星号的
-	//Fun11 func(main.ClsDemo, string)
-	//Fun21 func(main.ClsDemo, int)
-	method(cls)
+	ShowData(fieldValue.NumField())
 
-	fmt.Printf(cls.Name)
+	//objType.FieldAlign()
+	//
+	//fmt.Printf("%v", fieldValue.IsNil())
+	//fmt.Printf("%v", fieldValue.IsValid())
+	//
+	//myValue, _ := json.Marshal(fieldValue.Interface())
+	//
+	//fmt.Printf("%v", string(myValue))
+	//fmt.Println("=======")
+	////cls.Fun1("chg")
+	//
+	//// 显示带*的，也显示不带星号的
+	////Fun1 func(*main.ClsDemo, string)
+	////Fun11 func(*main.ClsDemo, string)
+	////Fun2 func(*main.ClsDemo, int)
+	////Fun21 func(*main.ClsDemo, int)
+	//method(&cls)
+	//fmt.Println("=======")
+	//// 只显示不带星号的
+	////Fun11 func(main.ClsDemo, string)
+	////Fun21 func(main.ClsDemo, int)
+	//method(cls)
+	//
+	//fmt.Printf(cls.Name)
+	//
+	//element()
+}
 
-	element()
+func ShowData(obj ...interface{}) {
+	var values []interface{}
+	for _, data := range obj {
+		myValue, _ := json.Marshal(data)
+		values = append(values, string(myValue))
+	}
+	fmt.Printf(fmt.Sprintf("核查错误：%v", values...))
 }
 
 func method(obj interface{}) {
@@ -64,11 +86,13 @@ func method(obj interface{}) {
 	}
 
 	objValue := reflect.ValueOf(obj)
-	data := "sdfsdf"
-	values := make([]reflect.Value, 1)
-	values[0] = reflect.ValueOf(data)
-	valueRun := objValue.MethodByName("Fun11")
-	valueRun.Call(values)
+	fmt.Printf("%v", objValue.Interface())
+	//
+	//data := "sdfsdf"
+	//values := make([]reflect.Value, 1)
+	//values[0] = reflect.ValueOf(data)
+	//valueRun := objValue.MethodByName("Fun11")
+	//valueRun.Call(values)
 }
 
 func field() {

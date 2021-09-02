@@ -8,8 +8,8 @@ import (
 )
 
 type ValidateEntity struct {
-	Name string `validate:"max=3"`
-	Age  int    `validate:"max=3"`
+	Name string
+	age  int `validate:"max=3"`
 }
 
 type MyEntity struct {
@@ -20,11 +20,11 @@ type MyEntity struct {
 func main() {
 
 	validate()
-	myTag()
+	//myTag()
 }
 
 func validate() {
-	entity := ValidateEntity{Name: "3fsdfasd", Age: 3123123}
+	entity := ValidateEntity{Name: "3fsdfasd", age: 3123123}
 	validate := validator.New()
 	err := validate.Struct(entity)
 	if err != nil {
