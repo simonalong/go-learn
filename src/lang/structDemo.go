@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 )
 
 type demo struct {
@@ -45,24 +44,4 @@ func main() {
 	//t := time.Now()
 	//fmt.Println(reflect.TypeOf(t).String())
 	//
-
-	var digitRegex = "^(0)|^[-+]?([1-9]+\\d*|0\\.(\\d*)|[1-9]\\d*\\.(\\d*))$"
-
-	// 返回 false
-	fmt.Println(regexp.MatchString(digitRegex, "2019-07-13 12:00:23.321"))
-	// 返回true
-	fmt.Println(regexp.MatchString(digitRegex, "12.321"))
-	// 返回true
-	fmt.Println(regexp.MatchString(digitRegex, "0"))
-	// 返回true
-	fmt.Println(regexp.MatchString(digitRegex, "-12.98"))
-	// 返回true
-	fmt.Println(regexp.MatchString(digitRegex, "+12321"))
-
-	reg := regexp.MustCompile(digitRegex)
-	datas := reg.FindAllStringSubmatch("2019-07-13 12:00:23.321", -1)[0]
-
-	for _, data := range datas {
-		fmt.Println(data)
-	}
 }

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strconv"
+	"time"
 )
 
 func main() {
@@ -94,20 +96,56 @@ func main() {
 	////31
 	////]
 
-	var rangeRegex = regexp.MustCompile("^(\\(|\\[)(.*)(,|，)(\\s)*(.*)(\\)|\\])$")
-	subData := rangeRegex.FindAllStringSubmatch("[1，2]", 1)
-	if len(subData) > 0 {
-		//beginAli := subData[0][1]
-		//begin := subData[0][2]
-		//end := subData[0][4]
-		//endAli := subData[0][5]
-		for _, data := range subData[0] {
-			fmt.Println(data)
-		}
-	}
-	fmt.Println("daasdf")
+	//var rangeRegex = regexp.MustCompile("^(\\(|\\[)(.*)(,|，)(\\s)*(.*)(\\)|\\])$")
+	//subData := rangeRegex.FindAllStringSubmatch("[1，2]", 1)
+	//if len(subData) > 0 {
+	//	//beginAli := subData[0][1]
+	//	//begin := subData[0][2]
+	//	//end := subData[0][4]
+	//	//endAli := subData[0][5]
+	//	for _, data := range subData[0] {
+	//		fmt.Println(data)
+	//	}
+	//}
+	//fmt.Println("daasdf")
 
-	regexp.MustCompile("^([-+])?(\\d*y)?(\\d*M)?(\\d*d)?(\\d*H|\\d*h)?(\\d*m)?(\\d*s)?$")
+	//
+	//var digitRegex = "^(0)|^[-+]?([1-9]+\\d*|0\\.(\\d*)|[1-9]\\d*\\.(\\d*))$"
+	//
+	//// 返回 false
+	//fmt.Println(regexp.MatchString(digitRegex, "2019-07-13 12:00:23.321"))
+	//// 返回true
+	//fmt.Println(regexp.MatchString(digitRegex, "12.321"))
+	//// 返回true
+	//fmt.Println(regexp.MatchString(digitRegex, "0"))
+	//// 返回true
+	//fmt.Println(regexp.MatchString(digitRegex, "-12.98"))
+	//// 返回true
+	//fmt.Println(regexp.MatchString(digitRegex, "+12321"))
+	//
+	//reg := regexp.MustCompile(digitRegex)
+	//datas := reg.FindAllStringSubmatch("2019-07-13 12:00:23.321", -1)[0]
+	//
+	//for _, data := range datas {
+	//	fmt.Println(data)
+	//}
+	var digitRegex = "^([-+])?(\\d*y)?(\\d*M)?(\\d*d)?(\\d*H|\\d*h)?(\\d*m)?(\\d*s)?$"
+
+	fmt.Println(regexp.MatchString(digitRegex, "-12.98"))
+	fmt.Println(regexp.MatchString(digitRegex, "2019-07-13 12:00:23.321"))
+	fmt.Println(regexp.MatchString(digitRegex, ""))
+
+	years, _ := strconv.Atoi(fmt.Sprintf("%v%v", "-", "1"))
+	fmt.Println(years)
+
+	var timePlusRegex = regexp.MustCompile("^([-+])?(\\d*y)?(\\d*M)?(\\d*d)?(\\d*H|\\d*h)?(\\d*m)?(\\d*s)?$")
+	datas := timePlusRegex.FindAllStringSubmatch("-1y2M3d4h5m6s", -1)
+	for i, data := range datas[0] {
+		fmt.Println(fmt.Sprintf("%v = %v", i, data))
+	}
+
+	s, _ := time.ParseDuration("-24h1m")
+	fmt.Println(time.Now().Add(s))
 }
 
 func showJson(object interface{}) {
