@@ -11,6 +11,21 @@ type ClsDemo struct {
 	Age  int
 }
 
+type ClsArrayDemo struct {
+	Name [2][3]string
+}
+
+type ClsMapDemo struct {
+	Data  map[string]float32
+	Data1 map[int]complex64
+	Data2 map[string]int
+}
+
+type ClsDemoPtr struct {
+	Name *string
+	Age  *int
+}
+
 func (c ClsDemo) Fun11(name string) {
 	c.Name = name
 }
@@ -27,13 +42,98 @@ func (c *ClsDemo) Fun2(age int) {
 	c.Age = age
 }
 
-func main() {
-	cls := ClsDemo{Name: "zhou"}
-	objValue := reflect.ValueOf(cls)
-	//objType := reflect.TypeOf(cls)
-	fieldValue := objValue.FieldByName("Name")
+type ValueInnerEntity struct {
+	Name string `match:"value={inner_zhou, inner_宋江}"`
+	Age  int    `match:"value={2212, 2213}"`
+}
 
-	ShowData(fieldValue.NumField())
+type ValueArrayEntity struct {
+	Inner [3]ValueInnerEntity `match:"check"`
+}
+
+func main() {
+
+	var value ValueArrayEntity
+	innerArray := [3]ValueInnerEntity{}
+
+	innerArray[0] = ValueInnerEntity{Age: 2212, Name: "inner_zhou"}
+	innerArray[1] = ValueInnerEntity{Age: 2213, Name: "inner_zhou"}
+	innerArray[2] = ValueInnerEntity{Age: 2214, Name: "inner_宋江"}
+	value.Inner = innerArray
+
+	names := [5]string{}
+	names[0] = "a"
+	names[1] = "b"
+
+	dataValue := reflect.ValueOf(value)
+	fieldValue := dataValue.Field(0)
+	for arrayIndex := 0; arrayIndex < fieldValue.Len(); arrayIndex++ {
+		fieldValueItem := fieldValue.Index(arrayIndex)
+		fmt.Println(fieldValueItem)
+	}
+
+	//fmt.Println(reflect.ValueOf(value).Kind().String())
+	//fmt.Println(reflect.ValueOf(value).Len())
+	fmt.Println(reflect.ValueOf(value).Field(0).Index(0))
+
+	//dataType := reflect.TypeOf(data)
+	//dataValue := reflect.ValueOf(data)
+	//fmt.Printf(reflect.TypeOf(data).Kind().String())
+
+	//field := reflect.TypeOf(data).Field(0)
+
+	//fmt.Println(dataValue.Field(0))
+	//fmt.Println(dataValue.Field(0).Kind().String())
+
+	//field.Type.Len()
+	//field.Type.In()
+	//fmt.Println(dataType.Field(0).Type.Len())
+	//fmt.Println(dataType.Field(0).Type)
+	//fmt.Println(dataType.Field(0).Type.Kind())
+	//fmt.Println(dataType.Field(0).Type.Name())
+	//fmt.Println(dataType.Field(0).Type.PkgPath())
+	//fmt.Println(dataValue.Field(0).Type().Elem())
+
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//var datas [3]ClsArrayDemo
+	//datas[0] = "a"
+	//datas[1] = "b"
+	//datas[2] = "c"
+	//
+	//cls := ClsDemo{Name: "zhou"}
+	//
+	//fmt.Println(datas)
+	//fmt.Println(reflect.TypeOf(datas).Kind().String())
+	////dataValue := reflect.ValueOf(datas)
+	//fmt.Println(reflect.TypeOf(cls).PkgPath())
+
+	//
+	//var dataList []string
+	//dataList = append(dataList, "a")
+	//dataList = append(dataList, "b")
+	//dataList = append(dataList, "c")
+	//
+	//fmt.Println(dataList)
+	//fmt.Println(reflect.TypeOf(dataList).Kind().String())
+	//
+	//cls := ClsDemo{Name: "zhou"}
+	//
+	//// main.ClsDemo
+	//fmt.Println(reflect.TypeOf(cls).String())
+	//// ClsDemo
+	//fmt.Println(reflect.TypeOf(cls).Name())
+	//
+	//objValue := reflect.ValueOf(cls)
+	////objType := reflect.TypeOf(cls)
+	//fieldValue := objValue.FieldByName("Name")
+	//
+	//ShowData(fieldValue.NumField())
 
 	//objType.FieldAlign()
 	//

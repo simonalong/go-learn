@@ -3,6 +3,7 @@ module github.com/SimonAlong/go-learn
 go 1.12
 
 require (
+	github.com/antonmedv/expr v1.9.0
 	github.com/creack/pty v1.1.13 // indirect
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-playground/validator/v10 v10.9.0 // indirect
