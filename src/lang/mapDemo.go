@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 )
 
 func main() {
@@ -109,17 +108,30 @@ func mapShow4() {
 	dataMap["a"] = 1
 	dataMap["c"] = 3
 
-	dataValue := reflect.ValueOf(dataMap)
-	for _, value := range dataValue.MapKeys() {
-		//mjson, _ := json.Marshal(value)
-		//fmt.Println(string(mjson))
-		fmt.Sprintf("%v", value)
+	for k, v := range dataMap {
+		fmt.Println(k)
+		fmt.Println(v)
 	}
 
-	for mapR := dataValue.MapRange(); mapR.Next(); {
-		key := mapR.Key()
-		value := mapR.Value()
-		fmt.Println(key.Interface())
-		fmt.Println(value.Interface())
+	for k := range dataMap {
+		fmt.Println(k)
 	}
+
+	for _, v := range dataMap {
+		fmt.Println(v)
+	}
+
+	//dataValue := reflect.ValueOf(dataMap)
+	//for _, value := range dataValue.MapKeys() {
+	//	//mjson, _ := json.Marshal(value)
+	//	//fmt.Println(string(mjson))
+	//	fmt.Sprintf("%v", value)
+	//}
+	//
+	//for mapR := dataValue.MapRange(); mapR.Next(); {
+	//	key := mapR.Key()
+	//	value := mapR.Value()
+	//	fmt.Println(key.Interface())
+	//	fmt.Println(value.Interface())
+	//}
 }

@@ -20,6 +20,7 @@ require (
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/ugorji/go v1.2.6 // indirect
 	github.com/yuin/goldmark v1.4.0 // indirect
+	golang.org/dl v0.0.0-20210831190321-294a5db02644 // indirect
 	golang.org/x/net v0.0.0-20210716203947-853a461950ff // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/tools v0.1.5 // indirect
