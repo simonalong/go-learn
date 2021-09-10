@@ -64,10 +64,8 @@ func test1() {
 // 将其中的root.xx和current生成对应的占位符和sprintf字段，比如：数据#root.Age的名字#current不合法，转换为：sprintf("数据%v的名字%v不合法", root.Age, current)
 func errMsgToTemplate(errMsg string) string {
 
-
 	strings.Replace()
 }
-
 
 func Replace(s, old, new string, n int) string {
 	if old == new || n == 0 {
@@ -93,7 +91,7 @@ func Replace(s, old, new string, n int) string {
 				j += wid
 			}
 		} else {
-			j += strings.Inde x(s[start:], old)
+			j += strings.Index(s[start:], old)
 		}
 		b.WriteString(s[start:j])
 		b.WriteString(new)
