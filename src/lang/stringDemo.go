@@ -7,11 +7,11 @@ import (
 )
 
 func main() {
-	str := "21203129"
-	fmt.Println(str)
-	fmt.Println(strings.TrimSpace(str))
-	fmt.Println(strings.Trim(str, " "))
-	fmt.Println(strings.Replace(str, "2", "8", 2))
+	//str := "21203129"
+	//fmt.Println(str)
+	//fmt.Println(strings.TrimSpace(str))
+	//fmt.Println(strings.Trim(str, " "))
+	//fmt.Println(strings.Replace(str, "2", "8", 2))
 	//
 	//fmt.Println(strings.Index(str, "="))
 	//index := strings.Index(str, "o")
@@ -56,16 +56,127 @@ func main() {
 	//}
 
 	test1()
+
+	// 97 ~ 122
+	//data := "a.z"
+	// 65~90
+	//data := "AZ中"
+	//
+	//for _, i2 := range data {
+	//	fmt.Println(i2)
+	//}
 }
+
+var currentKey = "#current"
+var rootKey = "#root"
+
 func test1() {
-	strings.Replace()
+	errMsg := "名字#root.Age不合法，还有当前的值#current不满足要求，还有#root.Name is not Empty"
+	fmt.Println(errMsg)
+	fmt.Println(errMsgChange(errMsg))
+}
+
+func errMsgChange(errMsg string) string {
+	var matchKeys []string
+	var chgMsg strings.Builder
+	chgMsg.WriteString("sprintf(\"")
+
+	var b strings.Builder
+	b.Grow(len(errMsg))
+
+	matchIndex := 0
+	matchLength := 0
+	for infoIndex, data := range errMsg {
+		c := string(data)
+		if c == "#" {
+			if findCurrentKey(infoIndex, 0, errMsg) {
+				matchIndex = 0
+				matchLength = len(currentKey)
+				b.WriteString("%v")
+				matchKeys = append(matchKeys, "current")
+				continue
+			} else if find, size, wordKey := findRootKey(infoIndex, 0, errMsg); find {
+				matchIndex = 0
+				matchLength = size
+				b.WriteString("%v")
+				matchKeys = append(matchKeys, "root"+wordKey)
+				continue
+			}
+		} else if matchIndex+1 < matchLength {
+			matchIndex++
+			continue
+		} else {
+			b.WriteString(c)
+		}
+	}
+
+	chgMsg.WriteString(b.String())
+	chgMsg.WriteString("\", ")
+
+	matchKeysSize := len(matchKeys)
+	for i, data := range matchKeys {
+		if i+1 < matchKeysSize {
+			chgMsg.WriteString(data)
+			chgMsg.WriteString(", ")
+		} else {
+			chgMsg.WriteString(data)
+		}
+	}
+	chgMsg.WriteString(")")
+
+	return chgMsg.String()
+}
+
+func findCurrentKey(infoIndex, matchIndex int, info string) bool {
+	if matchIndex >= len(currentKey) {
+		return true
+	}
+	if info[infoIndex:infoIndex+1] == currentKey[matchIndex:matchIndex+1] {
+		return findCurrentKey(infoIndex+1, matchIndex+1, info)
+	}
+	return false
+}
+
+func findRootKey(infoIndex, matchIndex int, info string) (bool, int, string) {
+	if matchIndex >= len(rootKey) {
+		nextKeyLength := nextMatchKeyLength(info[infoIndex:])
+		if nextKeyLength > 0 {
+			return true, len(rootKey) + nextKeyLength, info[infoIndex : infoIndex+nextKeyLength]
+		}
+		return false, 0, ""
+	}
+	if info[infoIndex:infoIndex+1] == rootKey[matchIndex:matchIndex+1] {
+		return findRootKey(infoIndex+1, matchIndex+1, info)
+	}
+	return false, 0, ""
+}
+
+// 下一个英文的单词长度
+// 97 ~ 122
+// 65 ~ 90
+func nextMatchKeyLength(errMsg string) int {
+	spaceIndex := strings.Index(strings.TrimSpace(errMsg), " ")
+	toMatchMsg := errMsg
+	if spaceIndex > 0 {
+		toMatchMsg = errMsg[:spaceIndex]
+	}
+	var index = 0
+	for _, c := range toMatchMsg {
+		// 判断是否是英文字符：a~z、A~Z和点号"."
+		if (c >= 97 && c <= 122) || (c >= 65 && c <= 90) || c == 46 {
+			index++
+			continue
+		} else {
+			return index
+		}
+	}
+	return index
 }
 
 // 将其中的root.xx和current生成对应的占位符和sprintf字段，比如：数据#root.Age的名字#current不合法，转换为：sprintf("数据%v的名字%v不合法", root.Age, current)
-func errMsgToTemplate(errMsg string) string {
-
-	strings.Replace()
-}
+//func errMsgToTemplate(errMsg string) string {
+//	strings.Index(errMsg, "#root")
+//}
 
 func Replace(s, old, new string, n int) string {
 	if old == new || n == 0 {
