@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/SimonAlong/go-learn/src/mikilin"
 	"github.com/go-playground/validator/v10"
-	"github.com/lunny/log"
 )
 
 type ValidateEntity struct {
@@ -32,15 +30,5 @@ func validate() {
 			fmt.Println(err)
 			return
 		}
-	}
-}
-
-func myTag() {
-
-	myentity := MyEntity{}
-
-	result, err := mikilin.Check(myentity)
-	if !result {
-		log.Errorf(err.Error())
 	}
 }

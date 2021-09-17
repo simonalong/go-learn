@@ -1,1 +1,1 @@
-package mikilin
+package mk

@@ -1,4 +1,4 @@
-package mikilin
+package mk
 
 const (
 	// VALUE 值列表

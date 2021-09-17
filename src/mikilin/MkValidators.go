@@ -1,4 +1,4 @@
-package mikilin
+package mk
 
 import (
 	"fmt"
