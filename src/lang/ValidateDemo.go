@@ -1,10 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"github.com/go-playground/validator/v10"
-)
-
 type ValidateEntity struct {
 	Name string
 	age  int `validate:"max=3"`
@@ -22,13 +17,5 @@ func main() {
 }
 
 func validate() {
-	entity := ValidateEntity{Name: "3fsdfasd", age: 3123123}
-	validate := validator.New()
-	err := validate.Struct(entity)
-	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			fmt.Println(err)
-			return
-		}
-	}
+
 }
