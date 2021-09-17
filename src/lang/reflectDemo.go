@@ -53,28 +53,37 @@ type ValueArrayEntity struct {
 
 func main() {
 
-	var value ValueArrayEntity
-	innerArray := [3]ValueInnerEntity{}
+	entity := ValueInnerEntity{Name: "chenzhen"}
+	entityValue := reflect.ValueOf(&entity)
+	fmt.Println(entityValue.Elem().Interface())
 
-	innerArray[0] = ValueInnerEntity{Age: 2212, Name: "inner_zhou"}
-	innerArray[1] = ValueInnerEntity{Age: 2213, Name: "inner_zhou"}
-	innerArray[2] = ValueInnerEntity{Age: 2214, Name: "inner_宋江"}
-	value.Inner = innerArray
+	data := "nihao"
+	entityValue.Elem().FieldByName("Name").SetString(data)
 
-	names := [5]string{}
-	names[0] = "a"
-	names[1] = "b"
+	fmt.Println(entity.Name)
 
-	dataValue := reflect.ValueOf(value)
-	fieldValue := dataValue.Field(0)
-	for arrayIndex := 0; arrayIndex < fieldValue.Len(); arrayIndex++ {
-		fieldValueItem := fieldValue.Index(arrayIndex)
-		fmt.Println(fieldValueItem)
-	}
-
-	//fmt.Println(reflect.ValueOf(value).Kind().String())
-	//fmt.Println(reflect.ValueOf(value).Len())
-	fmt.Println(reflect.ValueOf(value).Field(0).Index(0))
+	//var value ValueArrayEntity
+	//innerArray := [3]ValueInnerEntity{}
+	//
+	//innerArray[0] = ValueInnerEntity{Age: 2212, Name: "inner_zhou"}
+	//innerArray[1] = ValueInnerEntity{Age: 2213, Name: "inner_zhou"}
+	//innerArray[2] = ValueInnerEntity{Age: 2214, Name: "inner_宋江"}
+	//value.Inner = innerArray
+	//
+	//names := [5]string{}
+	//names[0] = "a"
+	//names[1] = "b"
+	//
+	//dataValue := reflect.ValueOf(value)
+	//fieldValue := dataValue.Field(0)
+	//for arrayIndex := 0; arrayIndex < fieldValue.Len(); arrayIndex++ {
+	//	fieldValueItem := fieldValue.Index(arrayIndex)
+	//	fmt.Println(fieldValueItem)
+	//}
+	//
+	////fmt.Println(reflect.ValueOf(value).Kind().String())
+	////fmt.Println(reflect.ValueOf(value).Len())
+	//fmt.Println(reflect.ValueOf(value).Field(0).Index(0))
 
 	//dataType := reflect.TypeOf(data)
 	//dataValue := reflect.ValueOf(data)
