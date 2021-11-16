@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type ValidateEntity struct {
 	Name string
 	age  int `validate:"max=3"`
@@ -17,5 +19,8 @@ func main() {
 }
 
 func validate() {
+	data := 12
 
+	n := data /2
+	fmt.Println(n)
 }
