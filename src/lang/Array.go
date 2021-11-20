@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // 数组声明：var variable_name [SIZE] variable_type
 // 数组初始化：var balance = [5]float32{1000.0, 2.0, 3.4, 7.0, 50.0}
@@ -11,6 +14,7 @@ func main() {
 	arrayFor()
 	arrayTest2()
 	test()
+	testSort()
 }
 
 func showArray1() {
@@ -67,6 +71,17 @@ func arrayFor() {
 
 func arrayTest2() {
 	fmt.Println("======================== array test2 ========================")
+	a := []int{1, 2, 3, 4, 5, 6, 7, 8}
+
+	fmt.Println("data", a[1:2])
+	fmt.Println("numbers[1:4] ==", a[1:4])
+
+	println(len(a))
+	println(cap(a))
+}
+
+func arrayTest3() {
+	fmt.Println("======================== array test3 ========================")
 	a := []int{1, 2, 3, 4, 5, 6, 7, 8}
 
 	fmt.Println("data", a[1:2])
@@ -145,4 +160,28 @@ func test() {
 	ss = append(ss, 2)
 	ss = append(ss, 3)
 	fmt.Println(ss)
+}
+
+type Node struct {
+	name string
+	age  int
+}
+
+func testSort() {
+	fmt.Println("======================== testSort ========================")
+	node1 := Node{age: 12}
+	node2 := Node{age: 1}
+	node3 := Node{age: 123}
+
+	nodes := []Node{}
+	nodes = append(nodes, node1)
+	nodes = append(nodes, node2)
+	nodes = append(nodes, node3)
+
+	// 降序
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].age > nodes[j].age
+	})
+
+	fmt.Println(nodes)
 }

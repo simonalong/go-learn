@@ -6,27 +6,29 @@ import (
 )
 
 func main() {
+	var a = map[string]string{}
+	a["a"] = "a1"
+	a["b"] = "b1"
+	a["c"] = "c1"
 
-	mapShow1()
-	mapShow2()
-	mapShow3()
-	mapPertty()
-	mapShow4()
+	for _, element := range a {
+		fmt.Print(element)
+	}
+
+	// a1b1c1
+	// c1a1b1
 }
 
 func mapShow1() {
-	fmt.Println("==================== ++ ====================")
-
-	// 定义map结构：key:string, value: string
 	var a = map[string]string{}
 
 	a["a"] = "a1"
 	a["b"] = "b1"
 	a["c"] = "c1"
 
-	fmt.Println(a)
-	fmt.Println(a["a"])
-	fmt.Println(a["b"])
+	for _, element := range a {
+		fmt.Println(element)
+	}
 }
 
 func mapShow2() {
