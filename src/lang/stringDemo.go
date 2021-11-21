@@ -66,30 +66,30 @@ func main() {
 	//	fmt.Println(i2)
 	//}
 
-	data := "a.b.c.d"
-	datas := strings.Split(data, ".")
-	// 4
-	fmt.Println(len(datas))
-	//a|b|c
-	fmt.Println(datas[0] + "|" + datas[1] + "|" + datas[2] + "|" + datas[3])
+	data := "a.d"
+	//datas := strings.Split(data, ".")
+	//// 4
+	//fmt.Println(len(datas))
+	////a|b|c
+	//fmt.Println(datas[0] + "|" + datas[1] + "|" + datas[2] + "|" + datas[3])
 
-	datas = strings.SplitN(data, ".", 2)
+	datas := strings.SplitN(data, ".", 2)
 	// 2
 	fmt.Println(len(datas))
 	//a|b.c
 	fmt.Println(datas[0] + "|" + datas[1])
-
-	datas = strings.SplitAfter(data, ".")
-	// 4
-	fmt.Println(len(datas))
-	//a.|b.|c
-	fmt.Println(datas[0] + "|" + datas[1] + "|" + datas[2] + "|" + datas[3])
-
-	datas = strings.SplitAfterN(data, ".", 2)
-	// 2
-	fmt.Println(len(datas))
-	//a.|b.c.d
-	fmt.Println(datas[0] + "|" + datas[1])
+	//
+	//datas = strings.SplitAfter(data, ".")
+	//// 4
+	//fmt.Println(len(datas))
+	////a.|b.|c
+	//fmt.Println(datas[0] + "|" + datas[1] + "|" + datas[2] + "|" + datas[3])
+	//
+	//datas = strings.SplitAfterN(data, ".", 2)
+	//// 2
+	//fmt.Println(len(datas))
+	////a.|b.c.d
+	//fmt.Println(datas[0] + "|" + datas[1])
 }
 
 var currentKey = "#current"

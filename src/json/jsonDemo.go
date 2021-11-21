@@ -12,5 +12,6 @@ type Entity struct {
 
 func main() {
 	entity := Entity{"nihao", 12}
-	fmt.Println(json.Marshal(entity))
+	data, _ := json.Marshal(entity)
+	fmt.Println(string(data))
 }
