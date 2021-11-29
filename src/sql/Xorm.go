@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/SimonAlong/go-learn/src/config"
 	"github.com/go-xorm/xorm"
+	"go-learn/src/config"
 )
 
 var db = config.GetDb()

@@ -8,6 +8,10 @@ type demo struct {
 	name string `form:"Name" binding:"required"`
 }
 
+type Demo1 struct {
+	name string `form:"Name" binding:"required"`
+}
+
 type A interface {
 	test()
 }
@@ -44,4 +48,10 @@ func main() {
 	//t := time.Now()
 	//fmt.Println(reflect.TypeOf(t).String())
 	//
+
+	var demo = Demo1{}
+	var demo1 = Demo1{}
+	if demo == demo1 {
+		 fmt.Println("true")
+	}
 }
