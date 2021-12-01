@@ -1,18 +1,65 @@
 package main
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 var base_api = "/api/core/test"
 
 func main() {
 	var r = gin.Default()
+	// 配置耗时
+	r.Use(timeoutMiddleware(time.Second * 10))
 	//controller(r)
-	r.GET("get2", get1)
+	r.GET("get1", get1)
+	r.POST("handle", handle)
+	r.GET("short", timedHandler(time.Second*5))
 	// 可以配置不同的端口
 	r.Run(":8080")
+}
+
+var watchMap map[string]chan string = make(map[string]chan string)
+
+func timeoutMiddleware(timeout time.Duration) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
+
+		defer func() {
+			if ctx.Err() == context.DeadlineExceeded {
+				c.Writer.WriteHeader(http.StatusGatewayTimeout)
+				c.JSON(http.StatusRequestTimeout, "request timeout")
+				c.Abort()
+			}
+			cancel()
+		}()
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	}
+}
+
+func timedHandler(duration time.Duration) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		ctx := c.Request.Context()
+
+		doneChan := make(chan string)
+		go func() {
+			time.Sleep(duration)
+		}()
+
+		watchMap["key"] = doneChan
+
+		select {
+
+		case <-ctx.Done():
+			return
+
+		case res := <-doneChan:
+			c.JSON(http.StatusOK, res)
+		}
+	}
 }
 
 func controller(t *gin.Engine) {
@@ -31,15 +78,28 @@ func get1(c *gin.Context) {
 	//dataReq := DataReq{}
 	//err := c.BindJSON(&dataReq)
 	//id := c.Param("id")
-	key := c.Query("Key")
-	//if err != nil {
-	//	return
-	//}
-	//c.JSON(http.StatusOK, gin.H{"message": "pong"})
+	//time.Sleep(3 * time.Second)
+	//key := c.Query("Key")
+	////if err != nil {
+	////	return
+	////}
+	////c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"code":    "success",
 		"message": "成功",
-		"data":    key,
+		"data":    "haha",
+	})
+
+}
+
+func handle(c *gin.Context) {
+	chanStr := watchMap["key"]
+	chanStr <- "hahahahah"
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"code":    "success",
+		"message": "成功",
+		"data":    "keyil",
 	})
 }
 

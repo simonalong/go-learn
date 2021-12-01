@@ -31,14 +31,14 @@ func (table *NeoTable1) String() string {
 }
 
 func main() {
-	truncate()
-	db.ShowSQL(true)
-
-	//insert()
-	//save()
-	//delete()
-	//update()
-	one()
+	//truncate()
+	//db.ShowSQL(true)
+	//
+	insert()
+	////save()
+	////delete()
+	////update()
+	//one()
 	//one2()
 	//one3()
 	//list()
@@ -55,6 +55,7 @@ func main() {
 	//execList()
 	//execValue()
 	//execValues()
+	test()
 }
 
 func truncate() {
@@ -386,4 +387,23 @@ func execValues() {
 	}
 
 	println(i)
+}
+
+func test() {
+	//var keyList []string
+	//err := db.Table("neo_table1").Cols("max(id)").Where("active_status=1").Find(&keyList)
+	//if err != nil {
+	//	return
+	//}
+
+	var sql = "select `id` from neo_table1 where id in (?, ?)"
+	var maxId []int64
+	var ids []interface{}
+	//var ids_obj []interface{}
+	ids = append(ids, 1)
+	ids = append(ids, 2)
+	db.SQL(sql, ids...).Find(&maxId)
+	//fmt.Println(data)
+	fmt.Println(maxId)
+	return
 }

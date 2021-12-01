@@ -20,5 +20,6 @@ func GetDb() *xorm.Engine {
 		}
 		instance = db
 	})
+	instance.ShowSQL(true)
 	return instance
 }
