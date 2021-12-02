@@ -84,10 +84,11 @@ func get1(c *gin.Context) {
 	////	return
 	////}
 	////c.JSON(http.StatusOK, gin.H{"message": "pong"})
+	ip, _ := c.RemoteIP()
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"code":    "success",
 		"message": "成功",
-		"data":    "haha",
+		"data":    c.ClientIP() + ", " + ip.String(),
 	})
 
 }
