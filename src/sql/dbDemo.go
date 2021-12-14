@@ -55,7 +55,17 @@ func main() {
 	//execList()
 	//execValue()
 	//execValues()
-	test()
+	//test()
+
+	num, _ := db.Table("neo_table1").Where("id=?", 1).Count(upgradeId)
+
+	//session := db.Table("data").Join("left", "config_center_config_item", "config_center_config_item.`app_id` = config_center_app_manager.`id`")
+	//session.Where("config_center_config_item.`id`=?", 12)
+	//var projectType string
+	//session.Cols("haod").Get(&projectType)
+
+	fmt.Println(num)
+	fmt.Println(upgradeId)
 }
 
 func truncate() {

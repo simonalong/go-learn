@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/lunny/log"
+	"github.com/simonalong/mikilin-go"
 	"net/http"
 	"time"
 )
@@ -15,6 +17,7 @@ func main() {
 	r.Use(timeoutMiddleware(time.Second * 10))
 	//controller(r)
 	r.GET("get1", get1)
+	r.POST("post1", post1)
 	r.POST("handle", handle)
 	r.GET("short", timedHandler(time.Second*5))
 	// 可以配置不同的端口
@@ -93,6 +96,34 @@ func get1(c *gin.Context) {
 
 }
 
+func post1(c *gin.Context) {
+	// {"message":"pong"}
+	dataReq := DataReq{}
+	err := c.BindJSON(&dataReq)
+	if err != nil {
+		log.Errorf("err：%v", err.Error())
+		return
+	}
+
+	checkResult, errMsg := mikilin.Check(dataReq)
+	if !checkResult {
+		log.Warnf(errMsg)
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"code":    "success",
+		"message": "成功",
+		"data":    dataReq,
+	})
+	//ip, _ := c.RemoteIP()
+	//c.JSON(http.StatusOK, map[string]interface{}{
+	//	"code":    "success",
+	//	"message": "成功",
+	//	"data":    c.ClientIP() + ", " + ip.String(),
+	//})
+
+}
+
 func handle(c *gin.Context) {
 	chanStr := watchMap["key"]
 	chanStr <- "hahahahah"
@@ -105,8 +136,7 @@ func handle(c *gin.Context) {
 }
 
 type DataReq struct {
-	AppName string
-	Key     string
+	Age int `json:"age" match:"range=[0, 12]" errMsg:"age不合法，合法值：0~12，包含边界，当前：#current"`
 }
 
 //
