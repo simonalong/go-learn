@@ -118,7 +118,7 @@ func main() {
 	}, &MyFormatter{})
 	serviceLog.AddHook(lfHook)
 
-	//serviceLog.WithField("name", "ball").WithField("say", "hi").Debug("info log")
+	serviceLog.WithField("name", "ball").WithField("say", "hi").Debug("info log")
 	serviceLog.WithField("name", "ball").WithField("say", "hi").Info("我们大沙发了晶澳科技到地方了卡接到飞龙卡机的阿里看电视剧非了；奥科吉的")
 	serviceLog.WithField("name", "ball").WithField("say", "hi").Warn("asdkfasdf ")
 	serviceLog.WithField("name", "ball").WithField("say", "hi").Error("我们大沙发了晶澳科技到地方了卡接到飞龙卡机的阿里看电视剧非了；奥科吉的")
@@ -128,8 +128,12 @@ type MyFormatter struct {
 }
 
 const (
+	white  = 29
+	black  = 30
 	red    = 31
+	green  = 32
 	yellow = 33
+	purple = 35
 	blue   = 36
 	gray   = 37
 )
@@ -149,12 +153,11 @@ func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		fields = append(fields, fmt.Sprintf("%s=%s", k, v))
 	}
 
-	fileVal := fmt.Sprintf("%s:%d", entry.Caller.File, entry.Caller.Line)
+	funPath := fmt.Sprintf("%s:%d", entry.Caller.File, entry.Caller.Line)
 
 	timestamp := entry.Time.Format("2006-01-02 15:04:05")
-	var newLog string
-	newLog = fmt.Sprintf("\x1b[%dm%s\x1b %s %s\t[%s] %s \n", red, strings.ToUpper(entry.Level.String()), timestamp, fileVal, entry.Message)
-	//newLog = fmt.Sprintf("\x1b%d\x1b %s\t%s %s %s\t[%s] %s \n", red, strings.ToUpper(entry.Level.String()), timestamp, fileVal, entry.Message, strings.Join(fields, " "), getPackage())
+	newLog := fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s [%s]\n", red, strings.ToUpper(entry.Level.String()), timestamp, 37, funPath, entry.Message, strings.Join(fields, " "))
+	//newLog := fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s %s %s [%s]\n", red, strings.ToUpper(entry.Level.String()), timestamp, funPath, entry.Message, strings.Join(fields, " "))
 
 	b.WriteString(newLog)
 	return b.Bytes(), nil
