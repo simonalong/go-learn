@@ -14,11 +14,12 @@ import (
 
 var serviceLog = logrus.New()
 var path = "/Users/zhouzhenyong/tem/learn-go/logs/access1"
+var debugRotate, _ = rotatelogs.New(path+"-debug.log.%Y%m%d", rotatelogs.WithLinkName(path+"-debug.log"), rotatelogs.WithMaxAge(30*24*time.Hour), rotatelogs.WithRotationTime(24*time.Hour))
 var infoRotate, _ = rotatelogs.New(path+"-info.log.%Y%m%d", rotatelogs.WithLinkName(path+"-info.log"), rotatelogs.WithMaxAge(30*24*time.Hour), rotatelogs.WithRotationTime(24*time.Hour))
 var warnRotate, _ = rotatelogs.New(path+"-warn.log.%Y%m%d", rotatelogs.WithLinkName(path+"-warn.log"), rotatelogs.WithMaxAge(30*24*time.Hour), rotatelogs.WithRotationTime(24*time.Hour))
 var errorRotate, _ = rotatelogs.New(path+"-error.log.%Y%m%d", rotatelogs.WithLinkName(path+"-error.log"), rotatelogs.WithMaxAge(30*24*time.Hour), rotatelogs.WithRotationTime(24*time.Hour))
-var fatalRotate, _ = rotatelogs.New(path+"-fatal.log.%Y%m%d", rotatelogs.WithLinkName(path+"-error.log"), rotatelogs.WithMaxAge(30*24*time.Hour), rotatelogs.WithRotationTime(24*time.Hour))
-var panicRotate, _ = rotatelogs.New(path+"-panic.log.%Y%m%d", rotatelogs.WithLinkName(path+"-error.log"), rotatelogs.WithMaxAge(30*24*time.Hour), rotatelogs.WithRotationTime(24*time.Hour))
+var fatalRotate, _ = rotatelogs.New(path+"-fatal.log.%Y%m%d", rotatelogs.WithLinkName(path+"-fatal.log"), rotatelogs.WithMaxAge(30*24*time.Hour), rotatelogs.WithRotationTime(24*time.Hour))
+var panicRotate, _ = rotatelogs.New(path+"-panic.log.%Y%m%d", rotatelogs.WithLinkName(path+"-panic.log"), rotatelogs.WithMaxAge(30*24*time.Hour), rotatelogs.WithRotationTime(24*time.Hour))
 
 func main() {
 	//// INFO[2021-12-14 17:28:28]
@@ -109,7 +110,7 @@ func main() {
 
 	serviceLog.Formatter = &MyFormatter{}
 	lfHook := lfshook.NewHook(lfshook.WriterMap{
-		logrus.DebugLevel: infoRotate, // 为不同级别设置不同的输出目的
+		logrus.DebugLevel: debugRotate,
 		logrus.InfoLevel:  infoRotate,
 		logrus.WarnLevel:  warnRotate,
 		logrus.ErrorLevel: errorRotate,
@@ -153,21 +154,28 @@ func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		fields = append(fields, fmt.Sprintf("%s=%s", k, v))
 	}
 
-	funPath := fmt.Sprintf("%s:%d", entry.Caller.File, entry.Caller.Line)
-
+	level := entry.Level
 	timestamp := entry.Time.Format("2006-01-02 15:04:05")
-	newLog := fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s [%s]\n", red, strings.ToUpper(entry.Level.String()), timestamp, 37, funPath, entry.Message, strings.Join(fields, " "))
-	//newLog := fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s %s %s [%s]\n", red, strings.ToUpper(entry.Level.String()), timestamp, funPath, entry.Message, strings.Join(fields, " "))
+	funPath := fmt.Sprintf("%s:%d", entry.Caller.File, entry.Caller.Line)
+	fieldsStr := strings.Join(fields, " ")
+	var newLog string
+	switch level {
+	case logrus.DebugLevel:
+		newLog = fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s [\x1b[%dm%s\x1b[0m]\n", white, strings.ToUpper(entry.Level.String()), timestamp, black, funPath, entry.Message, blue, fieldsStr)
+	case logrus.InfoLevel:
+		newLog = fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s [\x1b[%dm%s\x1b[0m]\n", green, strings.ToUpper(entry.Level.String()), timestamp, black, funPath, entry.Message, blue, fieldsStr)
+	case logrus.WarnLevel:
+		newLog = fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s [\x1b[%dm%s\x1b[0m]\n", yellow, strings.ToUpper(entry.Level.String()), timestamp, black, funPath, entry.Message, blue, fieldsStr)
+	case logrus.ErrorLevel:
+		newLog = fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s [\x1b[%dm%s\x1b[0m]\n", red, strings.ToUpper(entry.Level.String()), timestamp, black, funPath, entry.Message, blue, fieldsStr)
+	case logrus.FatalLevel:
+		newLog = fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s [\x1b[%dm%s\x1b[0m]\n", purple, strings.ToUpper(entry.Level.String()), timestamp, black, funPath, entry.Message, blue, fieldsStr)
+	case logrus.PanicLevel:
+		newLog = fmt.Sprintf("\x1b[%dm%s\t\x1b[0m%s \x1b[%dm%s\x1b[0m %s [\x1b[%dm%s\x1b[0m]\n", blue, strings.ToUpper(entry.Level.String()), timestamp, black, funPath, entry.Message, blue, fieldsStr)
+	}
 
 	b.WriteString(newLog)
 	return b.Bytes(), nil
-}
-
-func getPackage() []byte {
-	pc, _, _, _ := runtime.Caller(0)
-	fullFuncName := runtime.FuncForPC(pc).Name()
-	idx := strings.LastIndex(fullFuncName, ".")
-	return []byte(fullFuncName[:idx]) // trim off function details
 }
 
 const (
@@ -237,33 +245,5 @@ func getPackageName(f string) string {
 			break
 		}
 	}
-
 	return f
-}
-
-type DefaultFieldHook struct {
-}
-
-func (hook *DefaultFieldHook) Fire(entry *logrus.Entry) error {
-	switch entry.Level {
-	case logrus.PanicLevel:
-		fallthrough
-	case logrus.FatalLevel:
-		fallthrough
-	case logrus.ErrorLevel:
-		entry.Logger.Out = errorRotate
-	case logrus.WarnLevel:
-		entry.Logger.Out = warnRotate
-	case logrus.InfoLevel:
-		entry.Logger.Out = infoRotate
-	case logrus.DebugLevel:
-		entry.Logger.Out = infoRotate
-	default:
-		return nil
-	}
-	return nil
-}
-
-func (hook *DefaultFieldHook) Levels() []logrus.Level {
-	return logrus.AllLevels
 }
