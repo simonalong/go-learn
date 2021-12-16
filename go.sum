@@ -289,6 +289,8 @@ github.com/simonalong/tools v1.0.2-0.20211215111159-2207124a7475 h1:Y8AGMSDUK4yy
 github.com/simonalong/tools v1.0.2-0.20211215111159-2207124a7475/go.mod h1:Fz5D5Pq4gIHmNAWW0bn156O+QQkL8SptWdnylzs2BBc=
 github.com/simonalong/tools v1.0.2-0.20211215111314-fbc7f438f4be h1:b5OkGkXoqGaPHQdB3f6Rm0UzIFIejUe9PCcQc6zmKGo=
 github.com/simonalong/tools v1.0.2-0.20211215111314-fbc7f438f4be/go.mod h1:Fz5D5Pq4gIHmNAWW0bn156O+QQkL8SptWdnylzs2BBc=
+github.com/simonalong/tools v1.0.2-0.20211216025818-45c383a87a1a h1:KComi14TMSDoQzxH7DSWMEaQp5UiJm9kic9yGlzfHKc=
+github.com/simonalong/tools v1.0.2-0.20211216025818-45c383a87a1a/go.mod h1:Fz5D5Pq4gIHmNAWW0bn156O+QQkL8SptWdnylzs2BBc=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=
 github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=

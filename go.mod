@@ -34,7 +34,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
 	github.com/simonalong/mikilin-go v1.0.2-0.20211208074724-b25f05b74f31 // indirect
-	github.com/simonalong/tools v1.0.2-0.20211215111314-fbc7f438f4be // indirect
+	github.com/simonalong/tools v1.0.2-0.20211216025818-45c383a87a1a // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
