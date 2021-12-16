@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lunny/log"
 	"github.com/simonalong/mikilin-go"
+	toolsLog "github.com/simonalong/tools/log"
 	"net/http"
 	"time"
 )
@@ -20,6 +21,8 @@ func main() {
 	r.POST("post1", post1)
 	r.POST("handle", handle)
 	r.GET("short", timedHandler(time.Second*5))
+
+	toolsLog.LogRouters(r)
 	// 可以配置不同的端口
 	r.Run(":8080")
 }
@@ -77,23 +80,12 @@ func controller(t *gin.Engine) {
 }
 
 func get1(c *gin.Context) {
-	// {"message":"pong"}
-	//dataReq := DataReq{}
-	//err := c.BindJSON(&dataReq)
-	//id := c.Param("id")
-	//time.Sleep(3 * time.Second)
-	//key := c.Query("Key")
-	////if err != nil {
-	////	return
-	////}
-	////c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	ip, _ := c.RemoteIP()
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"code":    "success",
 		"message": "成功",
 		"data":    c.ClientIP() + ", " + ip.String(),
 	})
-
 }
 
 func post1(c *gin.Context) {
