@@ -73,7 +73,9 @@ func arrayTest2() {
 	fmt.Println("======================== array test2 ========================")
 	a := []int{1, 2, 3, 4, 5, 6, 7, 8}
 
+	// data [2]
 	fmt.Println("data", a[1:2])
+	// numbers[1:4] == [2 3 4]
 	fmt.Println("numbers[1:4] ==", a[1:4])
 
 	println(len(a))

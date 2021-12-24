@@ -53,14 +53,35 @@ type ValueArrayEntity struct {
 
 func main() {
 
-	entity := ValueInnerEntity{Name: "chenzhen"}
-	entityValue := reflect.ValueOf(&entity)
-	fmt.Println(entityValue.Elem().Interface())
+	//entity := ValueInnerEntity{Name: "chenzhen"}
+	//entityValue := reflect.ValueOf(&entity)
+	//entityType := reflect.TypeOf(&entity)
+	////// {chenzhen 0}
+	////fmt.Println(entityValue.Elem().Interface())
+	////
+	////data := "nihao"
+	////entityValue.Elem().FieldByName("Name").SetString(data)
+	////
+	////// 你好
+	////fmt.Println(entity.Name)
+	//
+	//for index, num := 0, entityType.Elem().NumField(); index < num; index++ {
+	//	filedValue := entityValue.Elem().Field(index)
+	//	if filedValue.Kind() == reflect.Int {
+	//		entityValue.Elem().Field(index).Set(reflect.ValueOf(12))
+	//	} else if filedValue.Kind() == reflect.String {
+	//		entityValue.Elem().Field(index).Set(reflect.ValueOf("ok"))
+	//	}
+	//}
+	////entityValue.Elem().FieldByName("Name").SetString("ok")
+	//
+	//fmt.Println(entity)
 
-	data := "nihao"
-	entityValue.Elem().FieldByName("Name").SetString(data)
-
-	fmt.Println(entity.Name)
+	m := []string{}
+	t := reflect.TypeOf(m)
+	//fmt.Println(t.Key())
+	fmt.Println(t.Elem())
+	//v.MapIndex()
 
 	//var value ValueArrayEntity
 	//innerArray := [3]ValueInnerEntity{}
