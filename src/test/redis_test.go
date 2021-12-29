@@ -40,12 +40,6 @@ func pug() {
 	}
 }
 
-func watch(pubsub *redis.PubSub) {
-	for msg := range pubsub.Channel() {
-		fmt.Println(msg.Payload)
-	}
-}
-
 type ConfigCenterMessage struct {
 
 	// 跟踪的id
@@ -66,6 +60,16 @@ type ConfigCenterMessage struct {
 var Ctx = context.Background()
 
 func TestPpub(t *testing.T) {
+	pub()
+	time.Sleep(4000 * time.Second)
+}
+
+func TestOpenRedisSubscribe(t *testing.T) {
+	sub()
+	time.Sleep(10000 * time.Second)
+}
+
+func pub() {
 	var configCenterMessage = ConfigCenterMessage{}
 	configCenterMessage.Profile = "sdf"
 	configCenterMessage.AppId = 12312
@@ -75,33 +79,47 @@ func TestPpub(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
+	time.Sleep(time.Second)
+	err = RedisDb.Publish(Ctx, "/redis/isyscore/os/config", Base64Encode([]byte(util.ToJsonString(configCenterMessage)))).Err()
+	if err != nil {
+		panic(err)
+	}
+	time.Sleep(time.Second)
+
+	err = RedisDb.Publish(Ctx, "/redis/isyscore/os/config", Base64Encode([]byte(util.ToJsonString(configCenterMessage)))).Err()
+	if err != nil {
+		panic(err)
+	}
+	time.Sleep(time.Second)
+
+	err = RedisDb.Publish(Ctx, "/redis/isyscore/os/config", Base64Encode([]byte(util.ToJsonString(configCenterMessage)))).Err()
+	if err != nil {
+		panic(err)
+	}
+	time.Sleep(time.Second)
+
+	err = RedisDb.Publish(Ctx, "/redis/isyscore/os/config", Base64Encode([]byte(util.ToJsonString(configCenterMessage)))).Err()
+	if err != nil {
+		panic(err)
+	}
+	time.Sleep(time.Second)
 }
 
-func TestOpenRedisSubscribe(t *testing.T) {
+func sub() {
 	pubsub := RedisDb.Subscribe(Ctx, "/redis/isyscore/os/config")
-	defer func(pubsub *redis.PubSub) {
-		err := pubsub.Close()
-		if err != nil {
-
-		}
-	}(pubsub)
-
 	go watch(pubsub)
-
-	time.Sleep(10000 * time.Second)
 }
 
-func watch2(pubsub *redis.PubSub) {
+func watch(pubsub *redis.PubSub) {
 	for msg := range pubsub.Channel() {
 		data, _ := Base64Decode(msg.Payload)
 		message := ConfigCenterMessage{}
 		err := util.StrToObject(string(data), &message)
 		if err != nil {
-			fmt.Println("receive message config chang err", err.Error())
 			return
 		}
 
-		fmt.Println("收到配置变更")
 	}
 }
 
