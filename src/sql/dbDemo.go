@@ -37,7 +37,7 @@ func main() {
 	insert()
 	////save()
 	////delete()
-	////update()
+	update()
 	//one()
 	//one2()
 	//one3()
@@ -57,15 +57,15 @@ func main() {
 	//execValues()
 	//test()
 
-	num, _ := db.Table("neo_table1").Where("id=?", 1).Count(upgradeId)
+	//num, _ := db.Table("neo_table1").Where("id=?", 1).Count(upgradeId)
 
 	//session := db.Table("data").Join("left", "config_center_config_item", "config_center_config_item.`app_id` = config_center_app_manager.`id`")
 	//session.Where("config_center_config_item.`id`=?", 12)
 	//var projectType string
 	//session.Cols("haod").Get(&projectType)
 
-	fmt.Println(num)
-	fmt.Println(upgradeId)
+	//fmt.Println(num)
+	//fmt.Println(upgradeId)
 }
 
 func truncate() {
@@ -119,7 +119,8 @@ func update() {
 	data := NeoTable1{}
 	data.Name = "update_name"
 	data.Group = "update_group"
-	db.Where("`name`=? and `group`=?", "insert_name1", "insert_group1").Update(data)
+	db.Where("`name`=? and `group`=?", "insert_name1", "insert_group1").Update(&data)
+	fmt.Println(data)
 }
 
 func one() {

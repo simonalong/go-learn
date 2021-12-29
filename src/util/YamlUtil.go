@@ -18,11 +18,11 @@ type KeyValue struct {
 	Value interface{}
 }
 
-func YamlToPropertiesStr(contentOfYaml string) string {
-	// yaml 到 map
-	dataMap := YamlToMap(contentOfYaml)
-
-}
+//func YamlToPropertiesStr(contentOfYaml string) string {
+//	// yaml 到 map
+//	dataMap := YamlToMap(contentOfYaml)
+//
+//}
 
 //
 //
@@ -68,20 +68,7 @@ func MapToYaml(dataMap map[string]interface{}) string {
 //}
 
 // 进行深层嵌套的map数据处理
-func MapToProperties(dataMap map[string]interface{}) {
-	for key, value := range dataMap {
-		// map的判断
 
-		// 集合判断
-
-		// 分片判断
-
-		// string判断
-
-		// 其他类型
-	}
-}
-
-func doMapToProperties(value map[string]interface{}, prefix string) []string {
-
-}
+//func doMapToProperties(value map[string]interface{}, prefix string) []string {
+//
+//}

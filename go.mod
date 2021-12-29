@@ -21,6 +21,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.4 // indirect
+	github.com/goburrow/cache v0.1.4 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
@@ -34,7 +35,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
 	github.com/simonalong/mikilin-go v1.0.2-0.20211208074724-b25f05b74f31 // indirect
-	github.com/simonalong/tools v1.0.2-0.20211216063557-acfb449068e0 // indirect
+	github.com/simonalong/tools v1.0.2-0.20211228091424-1eef2ba6ed45 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect

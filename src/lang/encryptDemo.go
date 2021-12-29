@@ -4,62 +4,68 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/base64"
 	"fmt"
 )
 
 func main() {
-	//data, err := EncryptAES([]byte("zhouzhenyong"), []byte("iscConfigService"))
-	//if err != nil {
-	//	fmt.Println(err.Error())
-	//	return
-	//}
-	//fmt.Println(string(data))
-	//
+	data := encodeMsg("sdf3", "iscConfigService")
+	// 9xgDQRImgwjos9dKnKae0Q==
+	// java: bfWp5JjIf2TcFSteURVgqg==
+	fmt.Println(data)
 
-	re, err := DecryptAES([]byte("bfWp5JjIf2TcFSteURVgqg=="), []byte("iscConfigService"))
+	act := decodeMsg(data, "iscConfigService")
+	// sdf3
+	fmt.Println(act)
+}
+
+func padding(src []byte, blocksize int) []byte {
+	padnum := blocksize - len(src)%blocksize
+	pad := bytes.Repeat([]byte{byte(padnum)}, padnum)
+	return append(src, pad...)
+}
+
+func unpadding(src []byte) []byte {
+	n := len(src)
+	unpadnum := int(src[n-1])
+	return src[:n-unpadnum]
+}
+
+func EncryptAES2(src []byte, key []byte) []byte {
+	block, _ := aes.NewCipher(key)
+	src = padding(src, block.BlockSize())
+	blockmode := cipher.NewCBCEncrypter(block, key)
+	blockmode.CryptBlocks(src, src)
+	return src
+}
+
+func DecryptAES2(src []byte, key []byte) []byte {
+	block, _ := aes.NewCipher(key)
+	blockmode := cipher.NewCBCDecrypter(block, key)
+	blockmode.CryptBlocks(src, src)
+	src = unpadding(src)
+	return src
+}
+
+func decodeMsg(result, key string) string {
+	middle, err := Base64Decode(result)
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		fmt.Println("err1: ", err.Error())
+		return ""
 	}
-	fmt.Println(string(re))
+	re := DecryptAES2(middle, []byte(key))
+	return string(re)
 }
 
-func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
-	padding := blockSize - len(ciphertext)%blockSize
-	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(ciphertext, padtext...)
+func encodeMsg(content, key string) string {
+	re := EncryptAES2([]byte(content), []byte(key))
+	return Base64Encode(re)
 }
 
-func PKCS5UnPadding(origData []byte) []byte {
-	length := len(origData)
-	unpadding := int(origData[length-1])
-	return origData[:(length - unpadding)]
+func Base64Encode(src []byte) string {
+	return base64.StdEncoding.EncodeToString(src)
 }
 
-func EncryptAES(origData, key []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, err
-	}
-
-	blockSize := block.BlockSize()
-	origData = PKCS5Padding(origData, blockSize)
-	blockMode := cipher.NewCBCEncrypter(block, key[:blockSize])
-	crypted := make([]byte, len(origData))
-	blockMode.CryptBlocks(crypted, origData)
-	return crypted, nil
-}
-
-func DecryptAES(crypted, key []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, err
-	}
-
-	blockSize := block.BlockSize()
-	blockMode := cipher.NewCBCDecrypter(block, key[:blockSize])
-	origData := make([]byte, len(crypted))
-	blockMode.CryptBlocks(origData, crypted)
-	origData = PKCS5UnPadding(origData)
-	return origData, nil
+func Base64Decode(dst string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(dst)
 }

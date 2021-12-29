@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/magiconair/properties"
+	yaml2 "github.com/simonalong/tools/yaml"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	//var path_pre = "/Users/zhouzhenyong/project/private/Doramon/Ocean/src/test/resources/";
-	propertiesTest()
+	//propertiesTest()
 	//showStruct2(path_pre + "yml/base.yml")
 	//showStruct(path_pre + "yml/base1.yml")
 	//showStruct(path_pre + "yml/array1.yml")
@@ -29,6 +30,13 @@ func main() {
 	//
 	//propertiesTest()
 	//showStruct2();
+	jsonToYaml()
+}
+
+func jsonToYaml() {
+	//str1 := "[]"
+	str1 := "{\"appName\":\"reds\",\"configItemKey\":null,\"profile\":\"default\"}"
+	fmt.Println(util.JsonToYaml(str1))
 }
 
 func showStruct2(path string) {
