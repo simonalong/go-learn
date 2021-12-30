@@ -1,11 +1,5 @@
 package main
 
-import (
-	"context"
-	"fmt"
-	"github.com/go-redis/redis/v8"
-)
-
 func main() {
 
 	//fun()/**/
@@ -44,22 +38,22 @@ func main() {
 
 }
 
-func fun() {
-
-	// There is no error because go-redis automatically reconnects on error.
-	pubsub := RedisDb.Subscribe(ctx1, "mychannel1")
-
-	// Close the subscription when we are done.
-	defer func(pubsub *redis.PubSub) {
-		err := pubsub.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(pubsub)
-
-	ch := pubsub.Channel()
-
-	for msg := range ch {
-		fmt.Println(msg.Channel, msg.Payload)
-	}
-}
+//func fun() {
+//
+//	// There is no error because go-redis automatically reconnects on error.
+//	pubsub := RedisDb.Subscribe(ctx1, "mychannel1")
+//
+//	// Close the subscription when we are done.
+//	defer func(pubsub *redis.PubSub) {
+//		err := pubsub.Close()
+//		if err != nil {
+//			panic(err)
+//		}
+//	}(pubsub)
+//
+//	ch := pubsub.Channel()
+//
+//	for msg := range ch {
+//		fmt.Println(msg.Channel, msg.Payload)
+//	}
+//}

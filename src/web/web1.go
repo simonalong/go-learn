@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lunny/log"
 	"github.com/simonalong/mikilin-go"
@@ -15,9 +16,10 @@ var base_api = "/api/core/test"
 func main() {
 	var r = gin.Default()
 	// 配置耗时
-	r.Use(timeoutMiddleware(time.Second * 10))
+	r.Use(timeoutMiddleware(time.Second * 1))
 	//controller(r)
 	r.GET("get1", get1)
+	r.GET("get2", timedHandler2)
 	r.POST("post1", post1)
 	r.POST("handle", handle)
 	r.GET("short", timedHandler(time.Second*5))
@@ -29,7 +31,7 @@ func main() {
 
 var watchMap map[string]chan string = make(map[string]chan string)
 
-func timeoutMiddleware(timeout time.Duration) func(c *gin.Context) {
+func timeoutMiddleware2(timeout time.Duration) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
 
@@ -43,6 +45,44 @@ func timeoutMiddleware(timeout time.Duration) func(c *gin.Context) {
 		}()
 		c.Request = c.Request.WithContext(ctx)
 		c.Next()
+	}
+}
+
+func timeoutMiddleware(timeout time.Duration) func(c *gin.Context) {
+	return func(c *gin.Context) {
+
+		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
+		defer func() {
+			if ctx.Err() == context.DeadlineExceeded {
+				c.Writer.WriteHeader(http.StatusGatewayTimeout)
+				fmt.Println("超时1")
+				c.Abort()
+			}
+			fmt.Println("超时2")
+			cancel()
+		}()
+		fmt.Println("超时3")
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	}
+}
+
+func timedHandler2(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	doneChan := make(chan string)
+
+	go func() {
+		time.Sleep(2 * time.Second)
+		doneChan <- "sdf"
+	}()
+
+	select {
+	case <-ctx.Done():
+		fmt.Println("done")
+		return
+	case res := <-doneChan:
+		c.JSON(http.StatusOK, res)
 	}
 }
 
@@ -81,6 +121,7 @@ func controller(t *gin.Engine) {
 
 func get1(c *gin.Context) {
 	ip, _ := c.RemoteIP()
+	time.Sleep(10 * time.Second)
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"code":    "success",
 		"message": "成功",
