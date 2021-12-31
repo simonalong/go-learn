@@ -205,28 +205,45 @@ func deepPut(dataMap map[string]interface{}, key string, value interface{}) map[
 	return dataMap
 }
 
+type AppProfileInfo struct {
+	Profile string
+}
+
 func main() {
 	//fmt.Println(peelArray("e"))
 
-	str := "- d: 1\n- d: 2\n- d: 3\n- d: 4"
+	//str := "- d: 1\n- d: 2\n- d: 3\n- d: 4"
+	//
+	//fmt.Println(YamlToList(str))
+	//
+	//
+	//var dataMap = map[string]*[]int{}
+	//var inner = []int{}
+	//inner = append(inner, 1)
+	//inner = append(inner, 3)
+	//inner = append(inner, 43)
+	//inner = append(inner, 2)
+	//
+	//dataMap["a"] = &inner
+	//
+	//value, exist := dataMap["a"]
+	//if exist {
+	//	*value = append(*value, 554)
+	//} else {
+	//	dataMap["a"] = &inner
+	//}
+	//
+	//fmt.Println(dataMap)
 
-	fmt.Println(YamlToList(str))
+	dataMap := map[string]AppProfileInfo{}
+	dataMap["a"] = AppProfileInfo{
+		Profile: "zhou",
+	}
 
-
-	var dataMap = map[string]*[]int{}
-	var inner = []int{}
-	inner = append(inner, 1)
-	inner = append(inner, 3)
-	inner = append(inner, 43)
-	inner = append(inner, 2)
-
-	dataMap["a"] = &inner
-
-	value, exist := dataMap["a"]
+	val, exist := dataMap["a"]
 	if exist {
-		*value = append(*value, 554)
-	} else {
-		dataMap["a"] = &inner
+		val.Profile = "chen"
+		dataMap["a"] = val
 	}
 
 	fmt.Println(dataMap)
