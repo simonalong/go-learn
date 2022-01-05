@@ -1,6 +1,6 @@
 package main
 
-import "github.com/simonalong/tools/config"
+import "github.com/simonalong/gole/config"
 
 func main() {
 	config.GetValueString()

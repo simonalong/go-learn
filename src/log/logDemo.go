@@ -1,13 +1,12 @@
 package main
 
 import (
-	"github.com/simonalong/tools/log"
+	"github.com/simonalong/gole/log"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
 func main() {
-	log.LogPathSet("/Users/zhouzhenyong/tem/learn-go/logs/learn-go")
 
 	serviceLog := log.GetLogger("test")
 	serviceLog.SetLevel(logrus.DebugLevel)

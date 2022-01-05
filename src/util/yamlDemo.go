@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/magiconair/properties"
-	yaml2 "github.com/simonalong/tools/yaml"
+	yaml2 "github.com/simonalong/gole/yaml"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -36,7 +36,7 @@ func main() {
 func jsonToYaml() {
 	//str1 := "[]"
 	str1 := "{\"appName\":\"reds\",\"configItemKey\":null,\"profile\":\"default\"}"
-	fmt.Println(util.JsonToYaml(str1))
+	fmt.Println(yaml2.JsonToYaml(str1))
 }
 
 func showStruct2(path string) {

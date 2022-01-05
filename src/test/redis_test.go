@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/go-redis/redis/v8"
-	"github.com/simonalong/tools/util"
+	"github.com/simonalong/gole/util"
 	"math/rand"
 	"testing"
 	"time"

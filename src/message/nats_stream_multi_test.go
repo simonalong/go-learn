@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func TestNatsJsPub1(t *testing.T) {
+func TestNatsJsMultiPub1(t *testing.T) {
 	js, _ := GetStreamOfSend("stream-name", []string{"tag.*"})
 
 	// 发布信息
@@ -17,7 +17,7 @@ func TestNatsJsPub1(t *testing.T) {
 	}
 }
 
-func TestNatsJsPub2(t *testing.T) {
+func TestNatsJsMultiPub2(t *testing.T) {
 	js, _ := GetStreamOfSend("stream-name", []string{"tag.*"})
 
 	// 发布信息
@@ -33,7 +33,7 @@ func TestNatsJsPub2(t *testing.T) {
 	}
 }
 
-func TestNatsJsSub1(t *testing.T) {
+func TestNatsJsMultiSub1(t *testing.T) {
 	nc, _ := nats.Connect(nats.DefaultURL)
 	js, _ := nc.JetStream()
 
@@ -50,7 +50,7 @@ func TestNatsJsSub1(t *testing.T) {
 	nc.Close()
 }
 
-func TestNatsJsSub2(t *testing.T) {
+func TestNatsJsMultiSub2(t *testing.T) {
 	nc, _ := nats.Connect(nats.DefaultURL)
 	js, _ := nc.JetStream()
 

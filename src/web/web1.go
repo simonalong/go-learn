@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lunny/log"
+	toolsLog "github.com/simonalong/gole/log"
 	"github.com/simonalong/mikilin-go"
-	toolsLog "github.com/simonalong/tools/log"
 	"net/http"
 	"time"
 )
