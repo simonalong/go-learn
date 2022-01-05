@@ -11,7 +11,23 @@ func TestNatsJsPub1(t *testing.T) {
 	js, _ := GetStreamOfSend("stream-name", []string{"tag.*"})
 
 	// 发布信息
-	_, err := js.Publish("tag.key1", []byte("Hello World"))
+	_, err := js.Publish("tag.key1", []byte("Hello World11"))
+	if err != nil {
+		return
+	}
+}
+
+func TestNatsJsPub2(t *testing.T) {
+	js, _ := GetStreamOfSend("stream-name", []string{"tag.*"})
+
+	// 发布信息
+	_, err := js.Publish("tag.key1", []byte("Hello World21"))
+	if err != nil {
+		return
+	}
+
+	// 发布信息
+	_, err = js.Publish("tag.key2", []byte("Hello World22"))
 	if err != nil {
 		return
 	}
@@ -21,17 +37,26 @@ func TestNatsJsSub1(t *testing.T) {
 	nc, _ := nats.Connect(nats.DefaultURL)
 	js, _ := nc.JetStream()
 
-	// 创建消费者
-	js.AddConsumer("stream-name", &nats.ConsumerConfig{
-		// 所有消息都确认
-		AckPolicy: nats.AckAllPolicy,
-		// 只消费最后一次
-		DeliverPolicy: nats.DeliverLastPolicy,
-	})
-
 	// Simple Async Subscriber
 	_, err := js.Subscribe("tag.key1", func(m *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
+		fmt.Printf("key1: Received a message: %s\n", string(m.Data))
+	})
+	if err != nil {
+		fmt.Printf("error, %v", err.Error())
+		return
+	}
+
+	time.Sleep(100000 * time.Second)
+	nc.Close()
+}
+
+func TestNatsJsSub2(t *testing.T) {
+	nc, _ := nats.Connect(nats.DefaultURL)
+	js, _ := nc.JetStream()
+
+	// Simple Async Subscriber
+	_, err := js.Subscribe("tag.key2", func(m *nats.Msg) {
+		fmt.Printf("key2: Received a message: %s\n", string(m.Data))
 	})
 	if err != nil {
 		fmt.Printf("error, %v", err.Error())
@@ -47,67 +72,15 @@ func GetStreamOfSend(streamName string, subjects []string) (nats.JetStreamContex
 	js, _ := nc.JetStream()
 
 	// 创建流通道
-	info, _ := js.StreamInfo("stream-test")
+	info, _ := js.StreamInfo(streamName)
 	if nil == info {
 		_, err := js.AddStream(&nats.StreamConfig{
-			Name:     "stream-test",
-			Subjects: []string{"test.*"},
+			Name:     streamName,
+			Subjects: subjects,
 		})
 		if err != nil {
 			return nil, err
 		}
 	}
 	return js, nil
-}
-
-func TestNatsJsPub2(t *testing.T) {
-	js, _ := GetStreamOfSend("stream-name2", []string{"tag.*"})
-
-	// 发布信息
-	_, err := js.Publish("test.tag1", []byte("Hello World1"))
-	if err != nil {
-		return
-	}
-}
-
-func TestNatsJsSub2(t *testing.T) {
-	nc, _ := nats.Connect(nats.DefaultURL)
-	js, _ := nc.JetStream()
-
-	// 创建消费者
-	js.AddConsumer("stream-test", &nats.ConsumerConfig{
-		// 所有消息都确认
-		AckPolicy: nats.AckAllPolicy,
-		// 只消费最后一次
-		DeliverPolicy: nats.DeliverLastPolicy,
-	})
-
-	// Simple Async Subscriber
-	js.Subscribe("test.tag1", func(m *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
-	})
-
-	time.Sleep(100000 * time.Second)
-	nc.Close()
-}
-
-func TestNatsJsSub2and2(t *testing.T) {
-	nc, _ := nats.Connect(nats.DefaultURL)
-	js, _ := nc.JetStream()
-
-	// 创建消费者
-	js.AddConsumer("stream-test", &nats.ConsumerConfig{
-		// 所有消息都确认
-		AckPolicy: nats.AckAllPolicy,
-		// 只消费最后一次
-		DeliverPolicy: nats.DeliverLastPolicy,
-	})
-
-	// Simple Async Subscriber
-	js.Subscribe("test.tag2", func(m *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
-	})
-
-	time.Sleep(100000 * time.Second)
-	nc.Close()
 }
