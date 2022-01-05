@@ -32,20 +32,31 @@ func TestNatsJsBaseSub1(t *testing.T) {
 	UseConsumer(js, streamName, consumerName, groupName)
 	//
 	//
-	//sub, _ := js.SubscribeSync("tag4.key1")
+	//sub, _ := js.SubscribeSync(tag+".key1")
 	//msg, _ := sub.NextMsg(2 * time.Second)
+	//fmt.Println("---->>>m3", string(msg.Data))
 	//msg.Ack()
 
-	// Simple Async Subscriber
-	_, err := js.Subscribe(tag+".key1", func(m *nats.Msg) {
-		fmt.Printf("key1: Received a message: %s\n", string(m.Data))
-		m.Ack()
-	}, nats.ManualAck())
-
+	sub, err := js.QueueSubscribeSync(tag+".key1", groupName, nats.Durable(consumerName), nats.MaxDeliver(3), nats.AckExplicit())
+	m, err := sub.NextMsg(2 * time.Second)
 	if err != nil {
-		fmt.Printf("error, %v", err.Error())
-		return
+		fmt.Println("--->>>3error", err)
+		os.Exit(-1)
 	}
+	fmt.Println("---->>>m3", string(m.Data))
+	m.Ack()
+	sub.Unsubscribe()
+
+	//// Simple Async Subscriber
+	//_, err := js.Subscribe(tag+".key1", func(m *nats.Msg) {
+	//	fmt.Printf("key1: Received a message: %s\n", string(m.Data))
+	//	m.Ack()
+	//}, nats.ManualAck())
+	//
+	//if err != nil {
+	//	fmt.Printf("error, %v", err.Error())
+	//	return
+	//}
 	//
 	//// Create a druable consumer
 	//js.DeleteConsumer("stream-name4", "consumer4")
@@ -129,7 +140,7 @@ func TestNatsJsBase0(t *testing.T) {
 
 	// Simple Async Stream Publisher
 	for i := 0; i < 500; i++ {
-		_, err := js.PublishAsync("ORDERS.scratch", []byte(fmt.Sprintf("%s-%d", "hello", i)))
+		_, err := js.Publish("ORDERS.scratch", []byte(fmt.Sprintf("%s-%d", "hello", i)))
 		if err != nil {
 			fmt.Println("--->>>1berror", err)
 			os.Exit(-1)
