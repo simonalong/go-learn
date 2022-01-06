@@ -76,11 +76,22 @@ func TestNatsJsBaseSub1(t *testing.T) {
 		}
 	}
 
-	subscription, _ := js.PullSubscribe(subject, consumer)
-	msg, _ := subscription.Fetch(10)
-	for _, m := range msg {
-		fmt.Println(string(m.Data))
+	_, err := js.Subscribe(subject, func(m *nats.Msg) {
+		fmt.Printf("key1: Received a message: %s\n", string(m.Data))
+		m.Ack()
+	}, nats.ManualAck())
+
+	if err != nil {
+		fmt.Printf("error, %v", err.Error())
+		return
 	}
+
+	//subscription, _ := js.PullSubscribe(subject, consumer)
+	//msg, _ := subscription.Fetch(10)
+	//for _, m := range msg {
+	//	fmt.Println(string(m.Data))
+	//}
+
 	//
 	//js.Subscribe(tag, func(m *nats.Msg) {
 	//	fmt.Printf("key1---: Received a message: %s\n", string(m.Data))
