@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/nats-io/nats.go"
+	"github.com/simonalong/gole/util"
 	"testing"
 	"time"
 )
@@ -11,10 +12,12 @@ func TestNatsJsMultiPub1(t *testing.T) {
 	js, _ := GetStreamOfSend("stream-name", []string{"tag.*"})
 
 	// 发布信息
-	_, err := js.Publish("tag.key1", []byte("Hello World11"))
+	pubAck, err := js.Publish("tag.key1", []byte("Hello World11"))
 	if err != nil {
 		return
 	}
+
+	fmt.Println(util.ToJsonString(pubAck))
 }
 
 func TestNatsJsMultiPub2(t *testing.T) {
@@ -75,8 +78,10 @@ func GetStreamOfSend(streamName string, subjects []string) (nats.JetStreamContex
 	info, _ := js.StreamInfo(streamName)
 	if nil == info {
 		_, err := js.AddStream(&nats.StreamConfig{
-			Name:     streamName,
-			Subjects: subjects,
+			Name:      streamName,
+			Retention: nats.WorkQueuePolicy,
+			NoAck:     true,
+			Subjects:  subjects,
 		})
 		if err != nil {
 			return nil, err

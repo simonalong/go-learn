@@ -3,33 +3,112 @@ package test
 import (
 	"fmt"
 	"github.com/nats-io/nats.go"
+	"github.com/simonalong/gole/util"
 	"os"
 	"testing"
 	"time"
 )
 
 const (
-	streamName   = "stream-name5"
-	consumerName = "consumer-name5"
-	groupName    = "group-name5"
-	tag          = "tag5"
+	index      = "a"
+	streamName = "stream-name" + index
+	subjectAll = "subject.*"
+	subject    = "subject." + index
+	consumer   = "consumer1"
+	group      = "groupname"
 )
 
+var num = 0
+
 func TestNatsJsBasePub1(t *testing.T) {
-	js, _ := GetStreamOfSend(streamName, []string{tag + ".*"})
+	nc, _ := nats.Connect(nats.DefaultURL, func(options *nats.Options) error {
+		options.ReconnectWait = time.Second
+		return nil
+	})
+
+	js, _ := nc.JetStream()
+
+	// 创建流通道
+	info, _ := js.StreamInfo(streamName)
+	if nil == info {
+		_, err := js.AddStream(&nats.StreamConfig{
+			Name:       streamName,
+			Subjects:   []string{subjectAll},
+			Retention:  nats.WorkQueuePolicy,
+			Replicas:   1,
+			Discard:    nats.DiscardOld,
+			Duplicates: 30 * time.Second,
+		})
+		if err != nil {
+			return
+		}
+	}
 
 	// 发布信息
-	_, err := js.Publish(tag+".key1", []byte("Hello World11"))
+	_, err := js.Publish(subject, []byte("Hello World "+util.ToJsonString(num)))
+	num = num + 1
 	if err != nil {
 		return
 	}
 }
 
 func TestNatsJsBaseSub1(t *testing.T) {
+	nc, _ := nats.Connect(nats.DefaultURL, func(options *nats.Options) error {
+		options.ReconnectWait = time.Second
+		return nil
+	})
+
+	js, _ := nc.JetStream()
+	if cinfo, _ := js.ConsumerInfo(streamName, consumer); cinfo == nil {
+		_, err := js.AddConsumer(streamName, &nats.ConsumerConfig{
+			Durable:       consumer,
+			FilterSubject: subject,
+			ReplayPolicy:  nats.ReplayInstantPolicy,
+			AckPolicy:     nats.AckExplicitPolicy,
+			AckWait:       30 * time.Second,
+			DeliverPolicy: nats.DeliverAllPolicy,
+			MaxDeliver:    20,
+			MaxAckPending: 20000,
+		})
+		if err != nil {
+			fmt.Println("--->>>11 error ", err)
+			os.Exit(-1)
+		}
+	}
+
+	subscription, _ := js.PullSubscribe(subject, consumer)
+	msg, _ := subscription.Fetch(10)
+	for _, m := range msg {
+		fmt.Println(string(m.Data))
+	}
+	//
+	//js.Subscribe(tag, func(m *nats.Msg) {
+	//	fmt.Printf("key1---: Received a message: %s\n", string(m.Data))
+	//}, nats.ManualAck())
+	//
+	//js.QueueSubscribe(tag, groupName, func(m *nats.Msg) {
+	//	fmt.Printf("key2---: Received a message: %s\n", string(m.Data))
+	//}, nats.ManualAck())
+
+	time.Sleep(120000 * time.Second)
+	nc.Close()
+}
+
+func TestNatsJsBasePub11(t *testing.T) {
+	js, _ := GetStreamOfSend(streamName, []string{subjectAll})
+
+	// 发布信息
+	_, err := js.Publish(subject, []byte("Hello World11"))
+	if err != nil {
+		return
+	}
+}
+
+func TestNatsJsBaseSub11(t *testing.T) {
 	nc, _ := nats.Connect(nats.DefaultURL)
 	js, _ := nc.JetStream()
 
-	UseConsumer(js, streamName, consumerName, groupName)
+	UseConsumer(js, streamName, consumer, group)
 	//
 	//
 	//sub, _ := js.SubscribeSync(tag+".key1")
@@ -37,26 +116,26 @@ func TestNatsJsBaseSub1(t *testing.T) {
 	//fmt.Println("---->>>m3", string(msg.Data))
 	//msg.Ack()
 
-	sub, err := js.QueueSubscribeSync(tag+".key1", groupName, nats.Durable(consumerName), nats.MaxDeliver(3), nats.AckExplicit())
-	m, err := sub.NextMsg(2 * time.Second)
-	if err != nil {
-		fmt.Println("--->>>3error", err)
-		os.Exit(-1)
-	}
-	fmt.Println("---->>>m3", string(m.Data))
-	m.Ack()
-	sub.Unsubscribe()
-
-	//// Simple Async Subscriber
-	//_, err := js.Subscribe(tag+".key1", func(m *nats.Msg) {
-	//	fmt.Printf("key1: Received a message: %s\n", string(m.Data))
-	//	m.Ack()
-	//}, nats.ManualAck())
-	//
+	//sub, err := js.QueueSubscribeSync(tag+".key1", groupName, nats.Durable(consumerName), nats.MaxDeliver(3), nats.AckExplicit())
+	//m, err := sub.NextMsg(2 * time.Second)
 	//if err != nil {
-	//	fmt.Printf("error, %v", err.Error())
-	//	return
+	//	fmt.Println("--->>>3error", err)
+	//	os.Exit(-1)
 	//}
+	//fmt.Println("---->>>m3", string(m.Data))
+	//m.Ack()
+	//sub.Unsubscribe()
+
+	// Simple Async Subscriber
+	_, err := js.Subscribe(subject, func(m *nats.Msg) {
+		fmt.Printf("key1: Received a message: %s\n", string(m.Data))
+		m.Ack()
+	}, nats.ManualAck())
+
+	if err != nil {
+		fmt.Printf("error, %v", err.Error())
+		return
+	}
 	//
 	//// Create a druable consumer
 	//js.DeleteConsumer("stream-name4", "consumer4")
