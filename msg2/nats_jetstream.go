@@ -74,35 +74,35 @@ func main() {
 	}()
 
 	// our publisher thread
-	//go func() {
-	//	i := 0
-	//
-	//	for {
-	//		start := time.Now()
-	//
-	//		bytes, err := json.Marshal(&TestMessage1{
-	//			ID:          i,
-	//			PublishTime: start,
-	//		})
-	//		if err != nil {
-	//			log.Fatalf("could not get bytes from literal TestMessage... %v", err)
-	//		}
-	//
-	//		_, err = js.Publish(subject, bytes, deadlineCtx)
-	//		if err != nil {
-	//			if errors.Is(err, context.DeadlineExceeded) {
-	//				return
-	//			}
-	//
-	//			log.Errorf("error publishing: %v", err)
-	//		}
-	//
-	//		log.Infof("[publisher] sent %d, publish time usec: %d", i, time.Since(start).Microseconds())
-	//		time.Sleep(1 * time.Second)
-	//
-	//		i++
-	//	}
-	//}()
+	go func() {
+		i := 0
+
+		for {
+			start := time.Now()
+
+			bytes, err := json.Marshal(&TestMessage1{
+				ID:          i,
+				PublishTime: start,
+			})
+			if err != nil {
+				log.Fatalf("could not get bytes from literal TestMessage... %v", err)
+			}
+
+			_, err = js.Publish(subject, bytes, deadlineCtx)
+			if err != nil {
+				if errors.Is(err, context.DeadlineExceeded) {
+					return
+				}
+
+				log.Errorf("error publishing: %v", err)
+			}
+
+			log.Infof("[publisher] sent %d, publish time usec: %d", i, time.Since(start).Microseconds())
+			time.Sleep(1 * time.Second)
+
+			i++
+		}
+	}()
 
 	for {
 		select {
