@@ -21,7 +21,7 @@ const (
 	group      = "groupname"
 )
 
-func TestName(t *testing.T) {
+func TestProducer1(t *testing.T) {
 	nc, _ := nats.Connect("localhost:4222")
 	js, _ := nc.JetStream()
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
@@ -30,9 +30,12 @@ func TestName(t *testing.T) {
 	info, err := js.StreamInfo(streamName)
 	if nil == info {
 		_, err = js.AddStream(&nats.StreamConfig{
-			Name:      streamName,
-			Subjects:  []string{subject},
-			Retention: nats.WorkQueuePolicy,
+			Name:       streamName,
+			Subjects:   []string{subjectAll},
+			Retention:  nats.WorkQueuePolicy,
+			Replicas:   1,
+			Discard:    nats.DiscardOld,
+			Duplicates: 30 * time.Second,
 		}, nats.Context(ctx))
 		if err != nil {
 			log.Fatalf("can't add: %v", err)
@@ -67,7 +70,22 @@ func TestName(t *testing.T) {
 	}
 }
 
-func TestNam3(t *testing.T) {
+func TestConsumer1(t *testing.T) {
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	id := uuid.NewV4().String()
+	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
+	js, _ := nc.JetStream()
+	sub, _ := js.PullSubscribe(subject, "group")
+
+	for {
+		msgs, _ := sub.Fetch(1, nats.Context(ctx))
+		msg := msgs[0]
+		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
+		msg.Ack(nats.Context(ctx))
+	}
+}
+
+func TestConsumer2(t *testing.T) {
 	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))

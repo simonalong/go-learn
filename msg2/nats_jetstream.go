@@ -52,7 +52,7 @@ func main() {
 	}
 
 	// Custom context with timeout
-	tctx, cancel := context.WithTimeout(nctx, 10*time.Second)
+	tctx, cancel := context.WithTimeout(nctx, 10000*time.Second)
 	// Set a timeout for publishing using context.
 	deadlineCtx := nats.Context(tctx)
 	// our resulting usec measurements
@@ -69,17 +69,11 @@ func main() {
 		}
 	}()
 
-	go func() {
-		err := sub1(deadlineCtx, subject, results)
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
-	}()
-
 	// our publisher thread
 	go func() {
 		i := 0
 
+		time.Sleep(5 * time.Second)
 		for {
 			start := time.Now()
 
