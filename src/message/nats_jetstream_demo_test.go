@@ -20,21 +20,16 @@ func init() {
 }
 
 func TestDemo(t *testing.T) {
-	//stream := uuid.NewV4().String()
-	// subject := fmt.Sprintf("%s-bar", id)
-	stream := streamName
-	subject := subject
-
 	nc, _ := nats.Connect("localhost:4222")
 
 	js, _ := nc.JetStream()
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
 
-	info, err := js.StreamInfo(stream)
+	info, err := js.StreamInfo(streamName)
 	if nil == info {
 		_, err = js.AddStream(&nats.StreamConfig{
-			Name:      stream,
+			Name:      streamName,
 			Subjects:  []string{subject},
 			Retention: nats.WorkQueuePolicy,
 		}, nats.Context(ctx))
@@ -49,7 +44,7 @@ func TestDemo(t *testing.T) {
 	var totalMessages int64
 
 	go func() {
-		err := sub(ctx, subject)
+		err := sub()
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
@@ -80,7 +75,8 @@ func TestDemo(t *testing.T) {
 	}
 }
 
-func sub(ctx context.Context, subject string) error {
+func sub() error {
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
 	js, _ := nc.JetStream()
