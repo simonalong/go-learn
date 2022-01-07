@@ -12,15 +12,14 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// TestMessage is a message that can help test timings on jetstream
-//const (
-//	index      = "a3"
-//	streamName = "stream-name" + index
-//	subjectAll = "subject.*"
-//	subject    = "subject." + index
-//	consumer   = "consumer1"
-//	group      = "groupname"
-//)
+const (
+	index      = "a4"
+	streamName = "stream-name" + index
+	subjectAll = "subject.*"
+	subject    = "subject." + index
+	consumer   = "consumer1"
+	group      = "groupname"
+)
 
 func TestName(t *testing.T) {
 	nc, _ := nats.Connect("localhost:4222")
@@ -43,13 +42,6 @@ func TestName(t *testing.T) {
 	results := make(chan int64)
 	var totalTime int64
 	var totalMessages int64
-
-	go func() {
-		err := sub()
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
-	}()
 
 	go func() {
 		i := 0
@@ -75,23 +67,17 @@ func TestName(t *testing.T) {
 	}
 }
 
-func sub() error {
+func TestNam3(t *testing.T) {
 	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
-	var js nats.JetStream
-	js, _ = nc.JetStream()
-	sub, err := js.PullSubscribe(subject, "group")
-	if err != nil {
-		return err
-	}
+	js, _ := nc.JetStream()
+	sub, _ := js.PullSubscribe(subject, "group")
 
 	for {
 		msgs, _ := sub.Fetch(1, nats.Context(ctx))
 		msg := msgs[0]
 		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
-		err = msg.Ack(nats.Context(ctx))
+		msg.Ack(nats.Context(ctx))
 	}
-
-	return nil
 }
