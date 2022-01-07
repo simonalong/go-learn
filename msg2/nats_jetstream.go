@@ -4,30 +4,27 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
+	"fmt"
 	"math"
 	"time"
 
 	"github.com/nats-io/nats.go"
 	uuid "github.com/satori/go.uuid"
+	log "github.com/sirupsen/logrus"
 )
 
-// TestMessage is a message that can help test timings on jetstream
-type TestMessage struct {
+type TestMessage1 struct {
 	ID          int       `json:"id"`
 	PublishTime time.Time `json:"publish_time"`
 }
 
-func init() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-}
-
-var stream = "streamName222"
-
 func main() {
-	//stream := uuid.NewV4().String()
+
+	stream := uuid.NewV4().String()
 	// subject := fmt.Sprintf("%s-bar", id)
 	subject := stream
+
+	fmt.Println(stream)
 
 	nc, err := nats.Connect("localhost:4222")
 	if err != nil {
@@ -39,22 +36,26 @@ func main() {
 		log.Fatalf("error getting jetstream: %v", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
-	defer cancel()
+	nctx := nats.Context(context.Background())
 
 	info, err := js.StreamInfo(stream)
-	if nil == info {
-		_, err = js.AddStream(&nats.StreamConfig{
-			Name:      stream,
-			Subjects:  []string{subject},
-			Retention: nats.WorkQueuePolicy,
-		}, nats.Context(ctx))
-		if err != nil {
-			log.Fatalf("can't add: %v", err)
-		}
+	if err == nil {
+		log.Fatalf("Stream already exists: %v", info)
 	}
 
-	// Our resulting use measurements
+	_, err = js.AddStream(&nats.StreamConfig{
+		Name:     stream,
+		Subjects: []string{subject},
+	}, nctx)
+	if err != nil {
+		log.Fatalf("can't add: %v", err)
+	}
+
+	// Custom context with timeout
+	tctx, cancel := context.WithTimeout(nctx, 10*time.Second)
+	// Set a timeout for publishing using context.
+	deadlineCtx := nats.Context(tctx)
+	// our resulting usec measurements
 	results := make(chan int64)
 
 	var totalTime int64
@@ -62,14 +63,14 @@ func main() {
 	var totalMessages int64
 
 	go func() {
-		err := sub(ctx, subject, results)
+		err := sub1(deadlineCtx, subject, results)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
 	}()
 
 	go func() {
-		err := sub(ctx, subject, results)
+		err := sub1(deadlineCtx, subject, results)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
@@ -82,7 +83,7 @@ func main() {
 		for {
 			start := time.Now()
 
-			bytes, err := json.Marshal(&TestMessage{
+			bytes, err := json.Marshal(&TestMessage1{
 				ID:          i,
 				PublishTime: start,
 			})
@@ -90,16 +91,16 @@ func main() {
 				log.Fatalf("could not get bytes from literal TestMessage... %v", err)
 			}
 
-			_, err = js.Publish(subject, bytes, nats.Context(ctx))
+			_, err = js.Publish(subject, bytes, deadlineCtx)
 			if err != nil {
 				if errors.Is(err, context.DeadlineExceeded) {
 					return
 				}
 
-				log.Printf("error publishing: %v", err)
+				log.Errorf("error publishing: %v", err)
 			}
 
-			log.Printf("[publisher] sent %d, publish time usec: %d", i, time.Since(start).Microseconds())
+			log.Infof("[publisher] sent %d, publish time usec: %d", i, time.Since(start).Microseconds())
 			time.Sleep(1 * time.Second)
 
 			i++
@@ -108,9 +109,9 @@ func main() {
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-deadlineCtx.Done():
 			cancel()
-			log.Printf("sent %d messages with average time of %f", totalMessages, math.Round(float64(totalTime/totalMessages)))
+			log.Infof("sent %d messages with average time of %f", totalMessages, math.Round(float64(totalTime/totalMessages)))
 			js.DeleteStream(stream)
 			return
 		case usec := <-results:
@@ -120,10 +121,10 @@ func main() {
 	}
 }
 
-func sub(ctx context.Context, subject string, results chan int64) error {
+func sub1(ctx nats.ContextOpt, subject string, results chan int64) error {
 	id := uuid.NewV4().String()
 
-	nc, err := nats.Connect("localhost:4222", nats.Name(id))
+	nc, err := nats.Connect("localhost:4222")
 	if err != nil {
 		log.Fatalf("[%s] unable to connect to nats: %v", id, err)
 	}
@@ -135,30 +136,29 @@ func sub(ctx context.Context, subject string, results chan int64) error {
 		return err
 	}
 
-	sub, err := js.PullSubscribe(subject, "group")
+	sub, err := js.QueueSubscribeSync(subject, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
 	if err != nil {
 		return err
 	}
 
 	for {
-		msgs, err := sub.Fetch(1, nats.Context(ctx))
+		msg, err := sub.NextMsgWithContext(ctx)
 		if err != nil {
 			if errors.Is(err, context.DeadlineExceeded) {
 				break
 			}
 
-			log.Printf("[consumer: %s] error consuming, sleeping for a second: %v", id, err)
+			log.Errorf("[consumer: %s] error consuming, sleeping for a second: %v", id, err)
 			time.Sleep(1 * time.Second)
 
 			continue
 		}
-		msg := msgs[0]
 
-		var tMsg *TestMessage
+		var tMsg *TestMessage1
 
 		err = json.Unmarshal(msg.Data, &tMsg)
 		if err != nil {
-			log.Printf("[consumer: %s] error consuming, sleeping for a second: %v", id, err)
+			log.Errorf("[consumer: %s] error consuming, sleeping for a second: %v", id, err)
 			time.Sleep(1 * time.Second)
 
 			continue
@@ -167,12 +167,12 @@ func sub(ctx context.Context, subject string, results chan int64) error {
 		tm := time.Since(tMsg.PublishTime).Microseconds()
 		results <- tm
 
-		log.Printf("[consumer: %s] received msg (%d) after waiting usec: %d", id, tMsg.ID, tm)
+		log.Infof("[consumer: %s] received msg (%d) after waiting usec: %d", id, tMsg.ID, tm)
 
-		err = msg.Ack(nats.Context(ctx))
-		//if err != nil {
-		//	log.Printf("[consumer: %s] error acking message: %v", id, err)
-		//}
+		err = msg.Ack(ctx)
+		if err != nil {
+			log.Errorf("[consumer: %s] error acking message: %v", id, err)
+		}
 
 	}
 
