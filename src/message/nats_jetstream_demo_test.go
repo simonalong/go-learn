@@ -80,7 +80,7 @@ func sub() error {
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
 	js, _ := nc.JetStream()
-	sub, _ := js.PullSubscribe(subject, "group")
+	sub, _ := js.PullSubscribe(streamName, "group")
 
 	for {
 		msgs, err := sub.Fetch(1, nats.Context(ctx))
