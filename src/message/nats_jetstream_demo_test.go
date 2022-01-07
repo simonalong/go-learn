@@ -2,7 +2,6 @@ package test
 
 import (
 	"context"
-	"errors"
 	"github.com/simonalong/gole/util"
 	"log"
 	"math"
@@ -14,14 +13,17 @@ import (
 )
 
 // TestMessage is a message that can help test timings on jetstream
+//const (
+//	index      = "a3"
+//	streamName = "stream-name" + index
+//	subjectAll = "subject.*"
+//	subject    = "subject." + index
+//	consumer   = "consumer1"
+//	group      = "groupname"
+//)
 
-func init() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-}
-
-func TestDemo(t *testing.T) {
+func TestName(t *testing.T) {
 	nc, _ := nats.Connect("localhost:4222")
-
 	js, _ := nc.JetStream()
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
@@ -38,7 +40,6 @@ func TestDemo(t *testing.T) {
 		}
 	}
 
-	// Our resulting use measurements
 	results := make(chan int64)
 	var totalTime int64
 	var totalMessages int64
@@ -50,7 +51,6 @@ func TestDemo(t *testing.T) {
 		}
 	}()
 
-	// our publisher thread
 	go func() {
 		i := 0
 		for {
@@ -66,7 +66,7 @@ func TestDemo(t *testing.T) {
 		case <-ctx.Done():
 			cancel()
 			log.Printf("sent %d messages with average time of %f", totalMessages, math.Round(float64(totalTime/totalMessages)))
-			js.DeleteStream(stream)
+			js.DeleteStream(streamName)
 			return
 		case usec := <-results:
 			totalTime += usec
@@ -79,24 +79,18 @@ func sub() error {
 	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
-	js, _ := nc.JetStream()
-	sub, _ := js.PullSubscribe(streamName, "group")
+	var js nats.JetStream
+	js, _ = nc.JetStream()
+	sub, err := js.PullSubscribe(subject, "group")
+	if err != nil {
+		return err
+	}
 
 	for {
-		msgs, err := sub.Fetch(1, nats.Context(ctx))
-		if err != nil {
-			if errors.Is(err, context.DeadlineExceeded) {
-				break
-			}
-
-			log.Printf("[consumer: %s] error consuming, sleeping for a second: %v", id, err)
-			time.Sleep(1 * time.Second)
-
-			continue
-		}
+		msgs, _ := sub.Fetch(1, nats.Context(ctx))
 		msg := msgs[0]
-		log.Printf("[consumer: %s] received msg (%v)", id, msg)
-		msg.Ack(nats.Context(ctx))
+		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
+		err = msg.Ack(nats.Context(ctx))
 	}
 
 	return nil

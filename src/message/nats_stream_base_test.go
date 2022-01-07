@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	index      = "a1"
+	index      = "a4"
 	streamName = "stream-name" + index
 	subjectAll = "subject.*"
 	subject    = "subject." + index
