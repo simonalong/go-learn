@@ -2,7 +2,6 @@ package test
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"github.com/simonalong/gole/util"
 	"log"
@@ -23,7 +22,8 @@ func init() {
 func TestDemo(t *testing.T) {
 	//stream := uuid.NewV4().String()
 	// subject := fmt.Sprintf("%s-bar", id)
-	subject := stream
+	stream := streamName
+	subject := subject
 
 	nc, _ := nats.Connect("localhost:4222")
 
@@ -49,7 +49,7 @@ func TestDemo(t *testing.T) {
 	var totalMessages int64
 
 	go func() {
-		err := sub(ctx, subject, results)
+		err := sub(ctx, subject)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
@@ -80,7 +80,7 @@ func TestDemo(t *testing.T) {
 	}
 }
 
-func sub(ctx context.Context, subject string, results chan int64) error {
+func sub(ctx context.Context, subject string) error {
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
 	js, _ := nc.JetStream()
@@ -99,27 +99,8 @@ func sub(ctx context.Context, subject string, results chan int64) error {
 			continue
 		}
 		msg := msgs[0]
-
-		var tMsg *TestMessage
-
-		err = json.Unmarshal(msg.Data, &tMsg)
-		if err != nil {
-			log.Printf("[consumer: %s] error consuming, sleeping for a second: %v", id, err)
-			time.Sleep(1 * time.Second)
-
-			continue
-		}
-
-		tm := time.Since(tMsg.PublishTime).Microseconds()
-		results <- tm
-
-		log.Printf("[consumer: %s] received msg (%d) after waiting usec: %d", id, tMsg.ID, tm)
-
-		err = msg.Ack(nats.Context(ctx))
-		//if err != nil {
-		//	log.Printf("[consumer: %s] error acking message: %v", id, err)
-		//}
-
+		log.Printf("[consumer: %s] received msg (%v)", id, msg)
+		msg.Ack(nats.Context(ctx))
 	}
 
 	return nil
