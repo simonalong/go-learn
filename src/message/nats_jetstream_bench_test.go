@@ -72,7 +72,12 @@ func TestForBench(t *testing.T) {
 	sub, _ := js.PullSubscribe(benchStreamName, "group")
 
 	for {
-		msgs, _ := sub.Fetch(1, nats.Context(ctx))
+		msgs, err := sub.Fetch(1, nats.Context(ctx))
+		if nil != err {
+			log.Printf("err %v", err.Error())
+			time.Sleep(1 * time.Second)
+			continue
+		}
 		msg := msgs[0]
 		msg.Ack(nats.Context(ctx))
 	}

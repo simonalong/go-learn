@@ -20,7 +20,8 @@ type TestMessage1 struct {
 
 func main() {
 
-	stream := uuid.NewV4().String()
+	//stream := uuid.NewV4().String()
+	stream := "broadcastStreafdmName12fdssdf"
 	// subject := fmt.Sprintf("%s-bar", id)
 	subject := stream
 
@@ -39,16 +40,14 @@ func main() {
 	nctx := nats.Context(context.Background())
 
 	info, err := js.StreamInfo(stream)
-	if err == nil {
-		log.Fatalf("Stream already exists: %v", info)
-	}
-
-	_, err = js.AddStream(&nats.StreamConfig{
-		Name:     stream,
-		Subjects: []string{subject},
-	}, nctx)
-	if err != nil {
-		log.Fatalf("can't add: %v", err)
+	if nil == info {
+		_, err = js.AddStream(&nats.StreamConfig{
+			Name:     stream,
+			Subjects: []string{subject},
+		}, nctx)
+		if err != nil {
+			log.Fatalf("can't add: %v", err)
+		}
 	}
 
 	// Custom context with timeout
