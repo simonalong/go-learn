@@ -80,7 +80,6 @@ func main() {
 	go func() {
 		i := 0
 
-		time.Sleep(5 * time.Second)
 		for {
 			start := time.Now()
 

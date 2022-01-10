@@ -12,14 +12,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-const (
-	index      = "a4"
-	streamName = "stream-name" + index
-	subjectAll = "subject.*"
-	subject    = "subject." + index
-	consumer   = "consumer1"
-	group      = "groupname"
-)
+var fetchStreamName = "stream1"
+var fetchSubjectAll = "fetchSubject"
+var fetchSubject = "fetchSubject"
 
 func TestProducer1(t *testing.T) {
 	nc, _ := nats.Connect("localhost:4222")
@@ -27,11 +22,11 @@ func TestProducer1(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
 
-	info, err := js.StreamInfo(streamName)
+	info, err := js.StreamInfo(fetchStreamName)
 	if nil == info {
 		_, err = js.AddStream(&nats.StreamConfig{
-			Name:       streamName,
-			Subjects:   []string{subjectAll},
+			Name:       fetchStreamName,
+			Subjects:   []string{fetchSubjectAll},
 			Retention:  nats.WorkQueuePolicy,
 			Replicas:   1,
 			Discard:    nats.DiscardOld,
@@ -49,7 +44,7 @@ func TestProducer1(t *testing.T) {
 	go func() {
 		i := 0
 		for {
-			js.Publish(subject, []byte("message=="+util.ToString(i)), nats.Context(ctx))
+			js.Publish(fetchSubject, []byte("message=="+util.ToString(i)), nats.Context(ctx))
 			log.Printf("[publisher] sent %d", i)
 			time.Sleep(1 * time.Second)
 			i++
@@ -61,7 +56,7 @@ func TestProducer1(t *testing.T) {
 		case <-ctx.Done():
 			cancel()
 			log.Printf("sent %d messages with average time of %f", totalMessages, math.Round(float64(totalTime/totalMessages)))
-			js.DeleteStream(streamName)
+			js.DeleteStream(fetchStreamName)
 			return
 		case usec := <-results:
 			totalTime += usec
@@ -75,7 +70,7 @@ func TestConsumer1(t *testing.T) {
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
 	js, _ := nc.JetStream()
-	sub, _ := js.PullSubscribe(subject, "group")
+	sub, _ := js.PullSubscribe(fetchSubject, "group")
 
 	for {
 		msgs, _ := sub.Fetch(1, nats.Context(ctx))
@@ -90,7 +85,7 @@ func TestConsumer2(t *testing.T) {
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
 	js, _ := nc.JetStream()
-	sub, _ := js.PullSubscribe(subject, "group")
+	sub, _ := js.PullSubscribe(fetchSubject, "group")
 
 	for {
 		msgs, _ := sub.Fetch(1, nats.Context(ctx))
