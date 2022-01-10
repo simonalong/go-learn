@@ -12,9 +12,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-var fetchStreamName = "fetchStream"
-var fetchSubjectAll = "fetchSubject.*"
-var fetchSubject = "fetchSubject.key1"
+var fetchStreamName = "fetchStreamName"
+var fetchSubjectAll = "fetch.subject.*"
+var fetchSubject = "fetch.subject.key1"
 
 func TestProducer1(t *testing.T) {
 	nc, _ := nats.Connect("localhost:4222")
