@@ -18,46 +18,30 @@ type TestMessage1 struct {
 	PublishTime time.Time `json:"publish_time"`
 }
 
+var streamSub = "asdfasdfasdffff"
+var subAll = "tag.*"
+var sub = "tag2.key1"
+var sub2 = "subjectkey"
+
 func TestSend(t *testing.T) {
 	//stream := uuid.NewV4().String()
-	stream := "asdfasdfasdfasdf"
-	// subject := fmt.Sprintf("%s-bar", id)
+	stream := streamSub
 	subject := stream
-
-	nc, err := nats.Connect("localhost:4222")
-	if err != nil {
-		log.Fatalf("unable to connect to nats: %v", err)
-	}
-
-	js, err := nc.JetStream()
-	if err != nil {
-		log.Fatalf("error getting jetstream: %v", err)
-	}
-
+	nc, _ := nats.Connect("localhost:4222")
+	js, _ := nc.JetStream()
 	nctx := nats.Context(context.Background())
 
-	info, err := js.StreamInfo(stream)
-	if err == nil {
-		log.Fatalf("Stream already exists: %v", info)
-	}
-
-	_, err = js.AddStream(&nats.StreamConfig{
+	js.StreamInfo(stream)
+	_, _ = js.AddStream(&nats.StreamConfig{
 		Name:     stream,
 		Subjects: []string{subject},
 	}, nctx)
-	if err != nil {
-		log.Fatalf("can't add: %v", err)
-	}
 
-	// Custom context with timeout
 	tctx, cancel := context.WithTimeout(nctx, 10000*time.Second)
-	// Set a timeout for publishing using context.
 	deadlineCtx := nats.Context(tctx)
-	// our resulting usec measurements
 	results := make(chan int64)
 
 	var totalTime int64
-
 	var totalMessages int64
 
 	// our publisher thread
@@ -105,8 +89,84 @@ func TestSend(t *testing.T) {
 	}
 }
 
+func TestSend2(t *testing.T) {
+	nc, _ := nats.Connect("localhost:4222")
+	js, _ := nc.JetStream()
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
+	defer cancel()
+
+	info, err := js.StreamInfo(streamSub)
+	if nil == info {
+		_, err = js.AddStream(&nats.StreamConfig{
+			Name:       streamSub,
+			Subjects:   []string{sub2},
+			Retention:  nats.WorkQueuePolicy,
+			Replicas:   1,
+			Discard:    nats.DiscardOld,
+			Duplicates: 30 * time.Second,
+		}, nats.Context(ctx))
+		if err != nil {
+			log.Fatalf("can't add: %v", err)
+		}
+	}
+
+	results := make(chan int64)
+	var totalTime int64
+	var totalMessages int64
+
+	go func() {
+		i := 0
+		for {
+			js.Publish(streamSub, []byte("message=="+util.ToString(i)), nats.Context(ctx))
+			log.Printf("[publisher] sent %d", i)
+			time.Sleep(1 * time.Second)
+			i++
+		}
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			cancel()
+			log.Printf("sent %d messages with average time of %f", totalMessages, math.Round(float64(totalTime/totalMessages)))
+			js.DeleteStream(streamSub)
+			return
+		case usec := <-results:
+			totalTime += usec
+			totalMessages++
+		}
+	}
+}
+
+func TestSubDemo1(t *testing.T) {
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	id := uuid.NewV4().String()
+	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
+	js, _ := nc.JetStream()
+	sub, _ := js.QueueSubscribeSync(streamSub, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
+
+	for {
+		msg, _ := sub.NextMsgWithContext(nats.Context(ctx))
+		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
+		msg.Ack(nats.Context(ctx))
+	}
+}
+
+func TestSubDemo2(t *testing.T) {
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	id := uuid.NewV4().String()
+	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
+	js, _ := nc.JetStream()
+	sub, _ := js.QueueSubscribeSync(streamSub, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
+
+	for {
+		msg, _ := sub.NextMsgWithContext(nats.Context(ctx))
+		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
+		msg.Ack(nats.Context(ctx))
+	}
+}
+
 func TestSub1(t *testing.T) {
-	subject := "asdfasdfasdfasdf"
 	nc, _ := nats.Connect("localhost:4222")
 	js, _ := nc.JetStream()
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
@@ -118,7 +178,7 @@ func TestSub1(t *testing.T) {
 		log.Fatalf("[%s] unable to connect to nats: %v", id, err)
 	}
 
-	sub, err := js.QueueSubscribeSync(subject, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
+	sub, err := js.QueueSubscribeSync(streamSub, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
 	if err != nil {
 		return
 	}
@@ -159,7 +219,7 @@ func TestSub1(t *testing.T) {
 }
 
 func TestSub2(t *testing.T) {
-	subject := "asdfasdfasdfasdf"
+	subject := streamSub
 	nc, _ := nats.Connect("localhost:4222")
 	js, _ := nc.JetStream()
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
