@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"github.com/nats-io/nats.go"
 	"github.com/simonalong/gole/util"
@@ -39,14 +40,18 @@ func TestNatsJsMultiPub2(t *testing.T) {
 func TestNatsJsMultiSub1(t *testing.T) {
 	nc, _ := nats.Connect(nats.DefaultURL)
 	js, _ := nc.JetStream()
+	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	sub, _ := js.QueueSubscribeSync(subject, "myqueuegroup", nats.Durable("group"), nats.DeliverNew())
 
-	// Simple Async Subscriber
-	_, err := js.Subscribe("tag.key1", func(m *nats.Msg) {
-		fmt.Printf("key1: Received a message: %s\n", string(m.Data))
-	})
-	if err != nil {
-		fmt.Printf("error, %v", err.Error())
-		return
+	for {
+		msg, err := sub.NextMsgWithContext(nats.Context(ctx))
+		if err != nil {
+			fmt.Println("[consumer] error consuming, sleeping for a second:", err)
+			time.Sleep(1 * time.Second)
+
+			continue
+		}
+		fmt.Println(msg)
 	}
 
 	time.Sleep(100000 * time.Second)
@@ -58,8 +63,8 @@ func TestNatsJsMultiSub2(t *testing.T) {
 	js, _ := nc.JetStream()
 
 	// Simple Async Subscriber
-	_, err := js.Subscribe("tag.key2", func(m *nats.Msg) {
-		fmt.Printf("key2: Received a message: %s\n", string(m.Data))
+	_, err := js.Subscribe("tag.key1", func(m *nats.Msg) {
+		fmt.Printf("key1: Received a message: %s\n", string(m.Data))
 	})
 	if err != nil {
 		fmt.Printf("error, %v", err.Error())

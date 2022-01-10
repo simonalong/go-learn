@@ -69,6 +69,13 @@ func main() {
 		}
 	}()
 
+	go func() {
+		err := sub1(deadlineCtx, subject, results)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+	}()
+
 	// our publisher thread
 	go func() {
 		i := 0
