@@ -13,8 +13,8 @@ import (
 )
 
 var fetchStreamName = "fetchStream"
-var fetchSubjectAll = "fetch.subject.*"
-var fetchSubject = "fetch.subject.key1"
+var fetchSubjectAll = "fetchSubject.*"
+var fetchSubject = "fetchSubject.key1"
 
 func TestProducer1(t *testing.T) {
 	nc, _ := nats.Connect("localhost:4222")
@@ -73,7 +73,12 @@ func TestConsumer1(t *testing.T) {
 	sub, _ := js.PullSubscribe(fetchSubject, "group")
 
 	for {
-		msgs, _ := sub.Fetch(1, nats.Context(ctx))
+		msgs, err := sub.Fetch(1, nats.Context(ctx))
+		if nil != err {
+			log.Printf("err %v", err.Error())
+			time.Sleep(1 * time.Second)
+			continue
+		}
 		msg := msgs[0]
 		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
 		msg.Ack(nats.Context(ctx))
@@ -88,7 +93,12 @@ func TestConsumer2(t *testing.T) {
 	sub, _ := js.PullSubscribe(fetchSubject, "group")
 
 	for {
-		msgs, _ := sub.Fetch(1, nats.Context(ctx))
+		msgs, err := sub.Fetch(1, nats.Context(ctx))
+		if nil != err {
+			log.Printf("err %v", err.Error())
+			time.Sleep(1 * time.Second)
+			continue
+		}
 		msg := msgs[0]
 		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
 		msg.Ack(nats.Context(ctx))

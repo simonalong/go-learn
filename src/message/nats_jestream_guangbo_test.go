@@ -11,9 +11,10 @@ import (
 	"time"
 )
 
-var broadcastStreamSub = "stream"
-var broadcastSubAll = "broadcast.subject.*"
-var broadcastSub = "broadcast.subject.key1"
+var streamSub = "asdfasdfasdffff"
+var subAll = "tag.*"
+var sub = "tag2.key1"
+var sub2 = "subjectkey"
 
 func TestSend1(t *testing.T) {
 	nc, _ := nats.Connect("localhost:4222")
@@ -21,11 +22,11 @@ func TestSend1(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
 
-	info, err := js.StreamInfo(broadcastStreamSub)
+	info, err := js.StreamInfo(streamSub)
 	if nil == info {
 		_, err = js.AddStream(&nats.StreamConfig{
-			Name:       broadcastStreamSub,
-			Subjects:   []string{broadcastSubAll},
+			Name:       streamSub,
+			Subjects:   []string{subAll},
 			Retention:  nats.WorkQueuePolicy,
 			Replicas:   1,
 			Discard:    nats.DiscardOld,
@@ -43,7 +44,7 @@ func TestSend1(t *testing.T) {
 	go func() {
 		i := 0
 		for {
-			js.Publish(broadcastStreamSub, []byte("message=="+util.ToString(i)), nats.Context(ctx))
+			js.Publish(streamSub, []byte("message=="+util.ToString(i)), nats.Context(ctx))
 			log.Printf("[publisher] sent %d", i)
 			time.Sleep(1 * time.Second)
 			i++
@@ -55,7 +56,7 @@ func TestSend1(t *testing.T) {
 		case <-ctx.Done():
 			cancel()
 			log.Printf("sent %d messages with average time of %f", totalMessages, math.Round(float64(totalTime/totalMessages)))
-			js.DeleteStream(broadcastStreamSub)
+			js.DeleteStream(streamSub)
 			return
 		case usec := <-results:
 			totalTime += usec
@@ -69,12 +70,13 @@ func TestConsumer11(t *testing.T) {
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
 	js, _ := nc.JetStream()
-	sub, _ := js.QueueSubscribeSync(broadcastStreamSub, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
+	sub, _ := js.QueueSubscribeSync(streamSub, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
 
 	for {
 		msg, err := sub.NextMsgWithContext(ctx)
 		if err != nil {
 			log.Printf("err %v", err.Error())
+			time.Sleep(1 * time.Second)
 			continue
 		}
 		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
@@ -87,10 +89,15 @@ func TestConsumer12(t *testing.T) {
 	id := uuid.NewV4().String()
 	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
 	js, _ := nc.JetStream()
-	sub, _ := js.QueueSubscribeSync(broadcastStreamSub, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
+	sub, _ := js.QueueSubscribeSync(streamSub, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
 
 	for {
-		msg, _ := sub.NextMsgWithContext(ctx)
+		msg, err := sub.NextMsgWithContext(ctx)
+		if nil != err {
+			log.Printf("err %v", err.Error())
+			time.Sleep(1 * time.Second)
+			continue
+		}
 		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
 		msg.Ack(nats.Context(ctx))
 	}
