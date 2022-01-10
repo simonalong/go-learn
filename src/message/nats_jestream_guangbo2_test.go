@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var index = "-d"
+var index = "-index1"
 var broadcastStreamName = "broadcastStreamName" + index
 var broadcastSubjectAll = "broadcast.subject" + index + ".*"
 var broadcastSubject = "broadcast.subject" + index + ".key"
