@@ -2,16 +2,16 @@ package main
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"github.com/simonalong/gole/util"
+	"math"
 	"time"
 
 	"github.com/nats-io/nats.go"
-	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 )
 
-var streamSub = "streamDfffemo11"
+var streamSub = "streamDffffdsfdfdssffemo11"
 var subAll = streamSub
 
 func main() {
@@ -20,47 +20,57 @@ func main() {
 	stream := streamSub
 	// subject := fmt.Sprintf("%s-bar", id)
 	subject := stream
-	nc, _ := nats.Connect("localhost:4222")
-	js, _ := nc.JetStream()
+
+	fmt.Println(stream)
+
+	nc, err := nats.Connect("localhost:4222")
+	if err != nil {
+		log.Fatalf("unable to connect to nats: %v", err)
+	}
+
+	js, err := nc.JetStream()
+	if err != nil {
+		log.Fatalf("error getting jetstream: %v", err)
+	}
+
 	nctx := nats.Context(context.Background())
-	js.AddStream(&nats.StreamConfig{
-		Name:     stream,
-		Subjects: []string{subject},
-	}, nctx)
+
+	info, err := js.StreamInfo(stream)
+	if nil == info {
+		_, err = js.AddStream(&nats.StreamConfig{
+			Name:     stream,
+			Subjects: []string{subject},
+		}, nctx)
+		if err != nil {
+			log.Fatalf("can't add: %v", err)
+		}
+	}
 
 	// Custom context with timeout
 	tctx, cancel := context.WithTimeout(nctx, 10000*time.Second)
 	// Set a timeout for publishing using context.
 	deadlineCtx := nats.Context(tctx)
 	// our resulting usec measurements
+	results := make(chan int64)
 
-	go func() {
-		err := sub2()
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
-	}()
+	var totalTime int64
 
-	go func() {
-		err := sub2()
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
-	}()
+	var totalMessages int64
+
+	//go func() {
+	//	err := sub4()
+	//	if err != nil {
+	//		log.Fatalf("%v", err)
+	//	}
+	//}()
 
 	// our publisher thread
 	go func() {
 		i := 0
-
 		for {
-			_, err := js.Publish(subject, []byte("data"+util.ToString(i)), deadlineCtx)
+			js.Publish(subject, []byte("data "+util.ToString(i)), deadlineCtx)
 			time.Sleep(1 * time.Second)
-			if err != nil {
-				if errors.Is(err, context.DeadlineExceeded) {
-					return
-				}
-				log.Errorf("error publishing: %v", err)
-			}
+
 			i++
 		}
 	}()
@@ -69,9 +79,12 @@ func main() {
 		select {
 		case <-deadlineCtx.Done():
 			cancel()
-			log.Infof("sent messages with average")
+			log.Infof("sent %d messages with average time of %f", totalMessages, math.Round(float64(totalTime/totalMessages)))
 			js.DeleteStream(stream)
 			return
+		case usec := <-results:
+			totalTime += usec
+			totalMessages++
 		}
 	}
 
@@ -100,7 +113,7 @@ func main() {
 	//var totalMessages int64
 	//
 	//go func() {
-	//	err := sub2()
+	//	err := sub4()
 	//	if err != nil {
 	//		log.Fatalf("%v", err)
 	//	}
@@ -130,21 +143,24 @@ func main() {
 	//}
 }
 
-func sub2() error {
-	ctx, _ := context.WithTimeout(context.Background(), 1000*time.Second)
-	id := uuid.NewV4().String()
-	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
-	js, _ := nc.JetStream()
-	sub, _ := js.QueueSubscribeSync(streamSub, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
-
-	for {
-		msg, err := sub.NextMsgWithContext(ctx)
-		if nil != err {
-			log.Printf("err %v", err.Error())
-			time.Sleep(1 * time.Second)
-			continue
-		}
-		log.Printf("[consumer: %s] received msg (%v)", id, string(msg.Data))
-		msg.Ack(nats.Context(ctx))
-	}
-}
+//
+//func sub4() error {
+//	ctx2, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+//	ctx := nats.Context(ctx2)
+//	id := uuid.NewV4().String()
+//	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
+//	js, _ := nc.JetStream()
+//	sub, _ := js.QueueSubscribeSync("streamDffffdfdssffemo11", "myqueuegroup", nats.Durable(id), nats.DeliverNew())
+//
+//	for {
+//		msg, err := sub.NextMsgWithContext(ctx)
+//		if nil != err {
+//			log.Printf("err  sub4 %v", err.Error())
+//			time.Sleep(1 * time.Second)
+//			continue
+//		}
+//		log.Printf("[consumer sub4: %s] received msg (%v)", id, string(msg.Data))
+//		msg.Ack(ctx)
+//	}
+//	return nil
+//}

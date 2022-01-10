@@ -62,14 +62,14 @@ func main() {
 	var totalMessages int64
 
 	go func() {
-		err := sub1(deadlineCtx, subject, results)
+		err := Sub1(deadlineCtx, subject, results)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
 	}()
 
 	go func() {
-		err := sub1(deadlineCtx, subject, results)
+		err := Sub1(deadlineCtx, subject, results)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
@@ -120,7 +120,7 @@ func main() {
 	}
 }
 
-func sub1(ctx nats.ContextOpt, subject string, results chan int64) error {
+func Sub1(ctx nats.ContextOpt, subject string, results chan int64) error {
 	id := uuid.NewV4().String()
 
 	nc, err := nats.Connect("localhost:4222")

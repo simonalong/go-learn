@@ -58,6 +58,26 @@ func TestDemoSend2(t *testing.T) {
 	}
 }
 
+func TestDemoConsumer12(t *testing.T) {
+	ctx2, _ := context.WithTimeout(context.Background(), 1000*time.Second)
+	ctx := nats.Context(ctx2)
+	id := uuid.NewV4().String()
+	nc, _ := nats.Connect("localhost:4222", nats.Name(id))
+	js, _ := nc.JetStream()
+	sub, _ := js.QueueSubscribeSync(broadcastSubject, "myqueuegroup", nats.Durable(id), nats.DeliverNew())
+
+	for {
+		msg, err := sub.NextMsgWithContext(ctx)
+		if nil != err {
+			log.Printf("err  sub4 %v", err.Error())
+			time.Sleep(1 * time.Second)
+			continue
+		}
+		log.Printf("[consumer sub4: %s] received msg (%v)", id, string(msg.Data))
+		msg.Ack(ctx)
+	}
+}
+
 func TestDemoConsumer13(t *testing.T) {
 	ctx2, _ := context.WithTimeout(context.Background(), 1000*time.Second)
 	ctx := nats.Context(ctx2)
