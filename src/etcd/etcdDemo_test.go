@@ -52,6 +52,7 @@ func TestEtcd2(t *testing.T) {
 	// 创建契约
 	lease := clientv3.NewLease(etcdClient)
 
+	// 单位是秒
 	leaseRes, _ := lease.Grant(Ctx, 3)
 	etcdClient.Put(Ctx, "test:k2", "v2", clientv3.WithLease(leaseRes.ID))
 
