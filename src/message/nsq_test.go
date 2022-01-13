@@ -3,9 +3,9 @@ package test
 import (
 	"fmt"
 	"github.com/nsqio/go-nsq"
+	"github.com/simonalong/gole/util"
 	"log"
 	"testing"
-	"time"
 )
 
 type myMessageHandler struct{}
@@ -26,44 +26,90 @@ func (h *myMessageHandler) HandleMessage(m *nsq.Message) error {
 	return nil
 }
 
+var totalNsqNum = 1
+var totalNsqSize = 10000
+
 func TestPub(t *testing.T) {
 	cfg := nsq.NewConfig()
 	// 连接 nsqd 的 tcp 连接
 	//producer, err := nsq.NewProducer("127.0.0.1:4150", cfg)
-	producer, err := nsq.NewProducer("127.0.0.1:32811", cfg)
+	producer, err := nsq.NewProducer("127.0.0.1:32784", cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	doneChan := make(chan *nsq.ProducerTransaction, totalNsqNum*totalNsqSize)
+
 	// 发布消息
-	var count int
-	for {
-		count++
-		body := fmt.Sprintf("test %d", count)
-		fmt.Println("发布消息：" + body)
-		if err := producer.Publish("test", []byte(body)); err != nil {
+	for i := 0; i < totalNsqNum*totalNsqSize; i++ {
+		// 同步：
+		//js.Publish(broadcastPressSubject, []byte("message=="+util.ToString(i)), nats.Context(ctx))
+		if err := producer.PublishAsync("test-topic", []byte(fmt.Sprintf("test %d", i)), doneChan, "test"); err != nil {
 			log.Fatal("publish error: " + err.Error())
 		}
-		time.Sleep(1 * time.Second)
+		//time.Sleep(1 * time.Second)
 	}
+
+	for i := 0; i < totalNsqNum*totalNsqSize; i++ {
+		trans := <-doneChan
+		if trans.Error != nil {
+			t.Fatalf(trans.Error.Error())
+		}
+		if trans.Args[0].(string) != "test" {
+			t.Fatalf(`proxied arg "%s" != "test"`, trans.Args[0].(string))
+		}
+	}
+
+	log.Printf("send finish")
 }
 
-func TestSub(t *testing.T) {
+var pressNsqCount1 = 0
+var pressNsqCount2 = 0
+
+func TestSub1(t *testing.T) {
 	cfg := nsq.NewConfig()
-	consumer, err := nsq.NewConsumer("test", "levonfly", cfg)
+	consumer, err := nsq.NewConsumer("test-topic", "channel0", cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// 处理信息
 	consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
-		log.Println(string(message.Body))
+		pressNsqCount1++
+		if pressNsqCount1%((totalNsqNum*totalNsqSize)/100) == 0 {
+			log.Printf("[consumer] received msg (%v) ratio: %s", string(message.Body), util.ToString((pressNsqCount1*100)/(totalNsqNum*totalNsqSize)))
+		}
+		//log.Printf("[consumer] received msg (%v) ratio: %s", string(message.Body), util.ToString((pressNsqCount1*100)/(totalNsqNum*totalNsqSize)))
 		return nil
 	}))
 
 	// 连接 nsqd 的 tcp 连接
 	//if err := consumer.ConnectToNSQD("127.0.0.1:4150"); err != nil {
-	if err := consumer.ConnectToNSQD("127.0.0.1:32811"); err != nil {
+	if err := consumer.ConnectToNSQD("127.0.0.1:32784"); err != nil {
+		log.Fatal(err)
+	}
+	<-consumer.StopChan
+}
+
+func TestSub2(t *testing.T) {
+	cfg := nsq.NewConfig()
+	consumer, err := nsq.NewConsumer("test-topic", "channel1", cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 处理信息
+	consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
+		pressNsqCount2++
+		if pressNsqCount2%((totalNsqNum*totalNsqSize)/100) == 0 {
+			log.Printf("[consumer] received msg (%v) ratio: %s", string(message.Body), util.ToString((pressNsqCount2*100)/(totalNsqNum*totalNsqSize)))
+		}
+		return nil
+	}))
+
+	// 连接 nsqd 的 tcp 连接
+	//if err := consumer.ConnectToNSQD("127.0.0.1:4150"); err != nil {
+	if err := consumer.ConnectToNSQD("127.0.0.1:32784"); err != nil {
 		log.Fatal(err)
 	}
 	<-consumer.StopChan
