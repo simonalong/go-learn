@@ -26,14 +26,14 @@ func (h *myMessageHandler) HandleMessage(m *nsq.Message) error {
 	return nil
 }
 
-var totalNsqNum = 1
+var totalNsqNum = 10
 var totalNsqSize = 10000
 
 func TestPub(t *testing.T) {
 	cfg := nsq.NewConfig()
 	// 连接 nsqd 的 tcp 连接
 	//producer, err := nsq.NewProducer("127.0.0.1:4150", cfg)
-	producer, err := nsq.NewProducer("127.0.0.1:32784", cfg)
+	producer, err := nsq.NewProducer("127.0.0.1:24150", cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,7 +85,7 @@ func TestSub1(t *testing.T) {
 
 	// 连接 nsqd 的 tcp 连接
 	//if err := consumer.ConnectToNSQD("127.0.0.1:4150"); err != nil {
-	if err := consumer.ConnectToNSQD("127.0.0.1:32784"); err != nil {
+	if err := consumer.ConnectToNSQD("127.0.0.1:24150"); err != nil {
 		log.Fatal(err)
 	}
 	<-consumer.StopChan
@@ -109,7 +109,7 @@ func TestSub2(t *testing.T) {
 
 	// 连接 nsqd 的 tcp 连接
 	//if err := consumer.ConnectToNSQD("127.0.0.1:4150"); err != nil {
-	if err := consumer.ConnectToNSQD("127.0.0.1:32784"); err != nil {
+	if err := consumer.ConnectToNSQD("127.0.0.1:24150"); err != nil {
 		log.Fatal(err)
 	}
 	<-consumer.StopChan
