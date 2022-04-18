@@ -18,19 +18,21 @@ var (
 
 var Ctx = context.Background()
 
-func init() {
+func TestEtcd0(t *testing.T) {
 	// 客户端配置
 	config = clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
+		Endpoints:   []string{"10.30.30.78:22379"},
 		DialTimeout: 5 * time.Second,
 		Username:    "root",
-		Password:    "root",
+		Password:    "ZljIsysc0re123",
 	}
 
 	if etcdClient, err = clientv3.New(config); err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	fmt.Println("ok")
 }
 
 func TestEtcd1(t *testing.T) {
