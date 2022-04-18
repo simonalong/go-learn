@@ -18,13 +18,11 @@ require (
 	github.com/simonalong/gole v1.0.2-0.20220308121856-76eab114d3d5
 	github.com/simonalong/mikilin-go v1.0.2-0.20211208074724-b25f05b74f31
 	github.com/sirupsen/logrus v1.8.1
-	go.etcd.io/etcd/client/v3 v3.5.1
+	go.etcd.io/etcd/client/v3 v3.5.3
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require (
-	github.com/robfig/cron v1.2.0 // indirect
-)
+require github.com/robfig/cron v1.2.0 // indirect
 
 require (
 	cloud.google.com/go v0.93.3 // indirect
@@ -54,8 +52,8 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.1 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.1 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.3 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.3 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
