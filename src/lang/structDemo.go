@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 type demo struct {
@@ -52,6 +53,19 @@ func main() {
 	var demo = Demo1{}
 	var demo1 = Demo1{}
 	if demo == demo1 {
-		 fmt.Println("true")
+		fmt.Println("true")
 	}
+
+	d := Demo1{name: "ok"}
+	ttt(&d)
+	fmt.Println(d)
+
+	for {
+		fmt.Println("xxxx")
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func ttt(dd *Demo1) {
+	dd.name = "change"
 }

@@ -11,13 +11,14 @@ import (
 	"strings"
 )
 
-func main1() {
+func main() {
 	var a = map[string]string{}
 	a["a"] = "a1"
 	a["b"] = "b1"
 	a["c"] = "c1"
 
-	for _, element := range a {
+	for k, element := range a {
+		fmt.Print(k)
 		fmt.Print(element)
 	}
 
@@ -209,7 +210,7 @@ type AppProfileInfo struct {
 	Profile string
 }
 
-func main() {
+func main1() {
 	//fmt.Println(peelArray("e"))
 
 	//str := "- d: 1\n- d: 2\n- d: 3\n- d: 4"

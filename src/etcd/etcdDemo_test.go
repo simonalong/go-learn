@@ -2,7 +2,9 @@ package test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/simonalong/gole/util"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"testing"
 	"time"
@@ -21,6 +23,8 @@ func init() {
 	config = clientv3.Config{
 		Endpoints:   []string{"localhost:2379"},
 		DialTimeout: 5 * time.Second,
+		Username:    "root",
+		Password:    "root",
 	}
 
 	if etcdClient, err = clientv3.New(config); err != nil {
@@ -30,38 +34,53 @@ func init() {
 }
 
 func TestEtcd1(t *testing.T) {
-	res, err := etcdClient.Put(Ctx, "test:key1", "v1")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	authRsp, _ := etcdClient.AuthStatus(Ctx)
+	fmt.Println(authRsp)
 
-	fmt.Println(res)
+	//res, err := etcdClient.Put(Ctx, "key4", "v1")
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//fmt.Println(res)
+	//
+	//res1, err := etcdClient.Get(Ctx, "key4")
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//fmt.Println(string(res1.Kvs[0].Value))
+}
 
-	res1, err := etcdClient.Get(Ctx, "test:key1")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+func TestKeys(t *testing.T) {
+	etcdClient.Put(Ctx, "test:k1", "v2")
+	etcdClient.Put(Ctx, "test:k1/k1", "v2")
+	etcdClient.Put(Ctx, "test:k1/k3", "v2")
+	etcdClient.Put(Ctx, "test:k2", "v2")
+	etcdClient.Put(Ctx, "test:k3", "v2")
+	etcdClient.Put(Ctx, "test:k4", "v2")
 
-	fmt.Println(string(res1.Kvs[0].Value))
+	rsp, _ := etcdClient.Get(Ctx, "test:*")
+	fmt.Println(util.ToString(rsp))
 }
 
 // 配置包含过期时间的
 func TestEtcd2(t *testing.T) {
 	// 创建契约
-	lease := clientv3.NewLease(etcdClient)
+	//lease := clientv3.NewLease(etcdClient)
 
 	// 单位是秒
-	leaseRes, _ := lease.Grant(Ctx, 3)
-	etcdClient.Put(Ctx, "test:k2", "v2", clientv3.WithLease(leaseRes.ID))
+	//leaseRes, _ := lease.Grant(Ctx, 3)
+	etcdClient.Put(Ctx, "test:k2", "v2")
 
 	res, _ := etcdClient.Get(Ctx, "test:k2")
 
-	fmt.Println(res)
+	fmt.Println(util.ToJsonString(res))
 	time.Sleep(2 * time.Second)
 	// 续约，其实就是又往后延迟了3秒
-	lease.KeepAliveOnce(Ctx, leaseRes.ID)
+	//lease.KeepAliveOnce(Ctx, leaseRes.ID)
 	res, _ = etcdClient.Get(Ctx, "test:k2")
 	fmt.Println(res)
 
@@ -95,4 +114,69 @@ func TestEtcd3(t *testing.T) {
 
 func TestEtcdChg(t *testing.T) {
 	etcdClient.Put(Ctx, "test:key1", "v2")
+}
+
+var data int64 = 1
+var num int64 = 120
+var count int64 = 12
+
+func TestEtcdReadPress(t *testing.T) {
+	var start = time.Now()
+	var i int64
+	var index int64
+
+	for index = 0; index < count; index++ {
+		for i = 0; i < data*num; i++ {
+			read()
+		}
+
+		time.Sleep(1 * time.Second)
+		fmt.Println(index + 1)
+	}
+
+	var end = time.Now()
+	var pre = (end.UnixMilli() - start.UnixMilli())
+	var result = util.ToString((data * num * count * 1000) / pre)
+	fmt.Printf("read finish, latency=%s, qps=%s", util.ToString(pre), result)
+}
+
+func TestEtcdWritePress(t *testing.T) {
+	var start = time.Now()
+	var i int64
+	for i = 0; i < data*num; i++ {
+		read()
+	}
+	var end = time.Now()
+	var pre = (end.UnixMilli() - start.UnixMilli())
+	var result = util.ToString((data * num * 1000) / pre)
+	fmt.Printf("write finish, qps=%s", result)
+}
+
+func read() {
+	_, err := etcdClient.Get(Ctx, "/key1")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func write(index int) {
+	_, err := etcdClient.Put(Ctx, "key4"+util.ToString(index), "v1"+util.ToString(index))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func TestName(t *testing.T) {
+
+	dataMap := map[string]string{}
+	dataMap["a"] = "a"
+	dataMap["b"] = "b"
+
+	bytes, err := json.Marshal(12)
+	if err != nil {
+		fmt.Printf("%v", err.Error())
+	}
+	fmt.Println(string(bytes))
 }

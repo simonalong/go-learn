@@ -26,7 +26,7 @@ func main() {
 
 	toolsLog.LogRouters(r)
 	// 可以配置不同的端口
-	r.Run(":8080")
+	r.Run(":8081")
 }
 
 var watchMap map[string]chan string = make(map[string]chan string)
@@ -121,9 +121,9 @@ func controller(t *gin.Engine) {
 
 func get1(c *gin.Context) {
 	ip, _ := c.RemoteIP()
-	time.Sleep(10 * time.Second)
+	//time.Sleep(10 * time.Second)
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"code":    "success",
+		"code":    "200",
 		"message": "成功",
 		"data":    c.ClientIP() + ", " + ip.String(),
 	})

@@ -1,8 +1,8 @@
-package main
+package util
 
 import "fmt"
 
-func main() {
+func main1() {
 
 	data := []string{}
 	data = testArray(data)

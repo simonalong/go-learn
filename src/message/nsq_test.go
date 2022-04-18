@@ -26,7 +26,7 @@ func (h *myMessageHandler) HandleMessage(m *nsq.Message) error {
 	return nil
 }
 
-var totalNsqNum = 10
+var totalNsqNum = 100
 var totalNsqSize = 10000
 
 func TestPub(t *testing.T) {

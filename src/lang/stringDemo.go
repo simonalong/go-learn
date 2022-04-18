@@ -87,9 +87,21 @@ func main() {
 	////a.|b.|c
 	//fmt.Println(datas[0] + "|" + datas[1] + "|" + datas[2] + "|" + datas[3])
 	//
-	//datas = strings.SplitAfterN(data, ".", 2)
-	//// 2
-	//fmt.Println(len(datas))
+
+	// [a b c]
+	fmt.Println(strings.Split("a.b.c", "."))
+	// [a b.c]
+	fmt.Println(strings.SplitN("a.b.c", ".", 2))
+	// [a. b. c]
+	fmt.Println(strings.SplitAfter("a.b.c", "."))
+	// [a. b.c]
+	fmt.Println(strings.SplitAfterN("a.b.c", ".", 2))
+
+	key := "a.b.c"
+	lastIndex := strings.LastIndex(key, ".")
+	fmt.Println(key[:lastIndex])
+	fmt.Println(key[lastIndex+1:])
+
 	////a.|b.c.d
 	//fmt.Println(datas[0] + "|" + datas[1])
 }
