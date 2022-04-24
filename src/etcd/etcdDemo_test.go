@@ -18,7 +18,7 @@ var (
 
 var Ctx = context.Background()
 
-func TestEtcd0(t *testing.T) {
+func init() {
 	// 客户端配置
 	config = clientv3.Config{
 		Endpoints:   []string{"10.30.30.78:22379"},
@@ -31,7 +31,6 @@ func TestEtcd0(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-
 	fmt.Println("ok")
 }
 
@@ -57,9 +56,9 @@ func TestEtcd1(t *testing.T) {
 }
 
 func TestKeys(t *testing.T) {
-	etcdClient.Put(Ctx, "test:k1", "v2")
-	etcdClient.Put(Ctx, "test:k1/k1", "v2")
-	etcdClient.Put(Ctx, "test:k1/k3", "v2")
+	etcdClient.Put(Ctx, "test:key1", "v2")
+	etcdClient.Put(Ctx, "test:key1/k1", "v2")
+	etcdClient.Put(Ctx, "test:key1/k3", "v2")
 	etcdClient.Put(Ctx, "test:k2", "v2")
 	etcdClient.Put(Ctx, "test:k3", "v2")
 	etcdClient.Put(Ctx, "test:k4", "v2")
