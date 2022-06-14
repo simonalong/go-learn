@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/simonalong/gole/util"
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"testing"
 	"time"
+
+	"github.com/simonalong/gole/util"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 var (
@@ -111,6 +112,7 @@ func TestEtcd3(t *testing.T) {
 
 		fmt.Println("now", time.Now(), "watchConfig", string(value))
 	}
+
 }
 
 func TestEtcdChg(t *testing.T) {

@@ -14,14 +14,23 @@ require (
 	github.com/magiconair/properties v1.8.5
 	github.com/nats-io/nats.go v1.13.1-0.20211122170419-d7c1d78a50fc
 	github.com/nsqio/go-nsq v1.1.0
+	github.com/robfig/cron v1.2.0
 	github.com/satori/go.uuid v1.2.0
+	github.com/simonalong/gole v1.0.2
 	github.com/simonalong/mikilin-go v1.0.2-0.20211208074724-b25f05b74f31
 	github.com/sirupsen/logrus v1.8.1
 	go.etcd.io/etcd/client/v3 v3.5.3
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require github.com/robfig/cron v1.2.0 // indirect
+require (
+	github.com/gomodule/redigo v1.8.8 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	google.golang.org/grpc v1.39.1 // indirect
+	gorm.io/driver/mysql v1.3.3 // indirect
+	gorm.io/gorm v1.23.5 // indirect
+)
 
 require (
 	cloud.google.com/go v0.93.3 // indirect
@@ -62,7 +71,6 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	google.golang.org/genproto v0.0.0-20210813162853-db860fec028c // indirect
-	google.golang.org/grpc v1.39.1 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	xorm.io/builder v0.3.6 // indirect
 	xorm.io/core v0.7.2-0.20190928055935-90aeac8d08eb

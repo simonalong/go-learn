@@ -1,9 +1,10 @@
-package main
+package test
 
 import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"testing"
 )
 
 type ClsDemo struct {
@@ -26,6 +27,10 @@ type ClsDemoPtr struct {
 	Age  *int
 }
 
+func (c ClsDemo) Fun4() {
+	fmt.Println("haha")
+}
+
 func (c ClsDemo) Fun11(name string) {
 	c.Name = name
 }
@@ -34,12 +39,16 @@ func (c ClsDemo) Fun21(age int) {
 	c.Age = age
 }
 
-func (c *ClsDemo) Fun1(name string) {
+func (c *ClsDemo) PtrFun1(name string) {
 	c.Name = name
 }
 
-func (c *ClsDemo) Fun2(age int) {
+func (c *ClsDemo) PtrFun2(age int) {
 	c.Age = age
+}
+
+func (c *ClsDemo) PtrFun3(data string) string {
+	return data
 }
 
 type ValueInnerEntity struct {
@@ -313,4 +322,34 @@ func element() {
 	// element name: 'cat', element kind: 'struct'
 	fmt.Printf("element name: '%v', element kind: '%v'\n", typeOfCat.Name(), typeOfCat.Kind())
 
+}
+
+func TestFun1(t *testing.T) {
+	cls := ClsDemo{}
+
+	clsType := reflect.TypeOf(&cls)
+	fmt.Println(clsType.NumMethod())
+	for index, num := 0, clsType.NumMethod(); index < num; index++ {
+		me := clsType.Method(index)
+		fmt.Println(me.Name)
+		fmt.Println(me.Type.In(index).Kind())
+	}
+
+	//if clsType.Kind() == reflect.Ptr {
+	//	clsType = clsType.Elem()
+	//}
+	//
+	//
+	//fmt.Println("--------------------")
+	//for index, num := 0, clsType.NumField(); index < num; index++ {
+	//	me := clsType.Field(index)
+	//	fmt.Println(me.Name)
+	//}
+
+	//m, _ := clsType.MethodByName("Fun4")
+	//var in = make([]reflect.Value, 1)
+	//in[0] = reflect.ValueOf(cls)
+	//fmt.Println(m.Func.Call(in))
+	//
+	//fmt.Println(m.Type.NumIn())
 }

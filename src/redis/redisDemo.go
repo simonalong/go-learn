@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"strings"
+
 	"github.com/go-redis/redis/v8"
 )
 
@@ -14,10 +17,12 @@ func main() {
 		//DB:       0,  // use default DB
 	})
 
-	err := rdb.Publish(ctx, "mychannel1", "payload").Err()
-	if err != nil {
-		panic(err)
+	redisMode, err := getRedisMode(rdb)
+	if nil != err {
+
 	}
+	fmt.Println(redisMode)
+
 	//time.Sleep(time.Second * 3)
 	//
 	//// There is no error because go-redis automatically reconnects on error.
@@ -26,16 +31,20 @@ func main() {
 	//// Close the subscription when we are done.
 	//defer pubsub.Close()
 
-	//err := rdb.Set(ctx, "key1", "12", 2*time.Second).Err()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//val, err := rdb.Get(ctx, "key1").Result()
-	//if err != nil {
-	//	fmt.Println("yichang")
-	//}
-	//fmt.Println("key1", val)
-	//
+	// err = rdb.Set(ctx, "key1", "12", 2*time.Second).Err()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// val, err := rdb.Get(ctx, "key1").Result()
+	// if err != nil {
+	// 	fmt.Println("yichang")
+	// }
+	// fmt.Println("key1", val)
+
+	// fmt.Println(runtime.GOMAXPROCS)
+	// fmt.Println(runtime.NumCPU())
+	// fmt.Println(runtime.GOMAXPROCS(2))
+	// fmt.Println(runtime.GOMAXPROCS(runtime.NumCPU()))
 
 	//
 	//val1, err := rdb.Get(ctx, "key1").Result()
@@ -91,4 +100,22 @@ func main() {
 	//}
 	//
 	//fmt.Println(count)
+}
+
+func getRedisMode(rdb *redis.Client) (string, error) {
+	cmd := rdb.Info(ctx, "server")
+	dataRs, err := cmd.Result()
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(dataRs)
+	datas := strings.Split(dataRs, "\n")
+	var mode = ""
+	for _, data := range datas {
+		if strings.Contains(data, "redis_mode") {
+			modes := strings.Split(data, ":")
+			mode = strings.TrimSpace(modes[1])
+		}
+	}
+	return mode, nil
 }
