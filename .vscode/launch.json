@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "online",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${file}"
+        },
+        {
+            "name": "go test",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            //当运行单个文件时{workspaceFolder}可改为{file}
+            "program": "${workspaceFolder}",
+            "env": {},
+            "args": []
+        }
+    ]
+}
