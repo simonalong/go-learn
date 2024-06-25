@@ -164,3 +164,26 @@ func showJson(object interface{}) {
 	bytes, _ := json.Marshal(object)
 	fmt.Println(string(bytes))
 }
+
+func TestOne(t *testing.T) {
+	dataMap := map[string]interface{}{}
+	fmt.Println(dataMap["x"])
+	d := dataMap["x"]
+	fmt.Println(d)
+}
+
+func TestMatch(t *testing.T) {
+	str := "test.nihao_ok"
+	pattern := "('_')*[a-zA-Z]([a-zA-Z]|[0-9]|'-'|'_')*"
+
+	//// 匹配任何大小写字母
+	//fragment LETTER: [a-zA-Z] ;
+	// // 匹配任何数字
+	//fragment DIGIT: [0-9];
+	//// 匹配中划线字符
+	//fragment HYPHEN: '-';
+	//// 匹配下划线字符
+	//fragment UNDERSCORE: '_';
+
+	fmt.Println(regexp.Match(pattern, []byte(str)))
+}

@@ -24,4 +24,6 @@ func TestTrim(t *testing.T) {
 	fmt.Println(data)
 	fmt.Println(strings.Trim(data, "\n"))
 	fmt.Println("ok")
+
+	fmt.Println(strings.Index())
 }

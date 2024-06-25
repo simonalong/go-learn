@@ -2,8 +2,9 @@ package test
 
 import (
 	"fmt"
-	"github.com/robfig/cron"
 	"testing"
+
+	"github.com/robfig/cron"
 )
 
 func TestCron1(t *testing.T) {
@@ -17,4 +18,13 @@ func TestCron1(t *testing.T) {
 
 	c.Start()
 	select {} //阻塞主线程停止
+}
+
+func TestFloatToInt(t *testing.T) {
+
+	var data float64
+	data = 1663211939089
+
+	var tem = int64(data)
+	fmt.Println(tem)
 }

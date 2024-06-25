@@ -180,3 +180,28 @@ func PathExists(path string) (bool, error) {
 	}
 	return false, err
 }
+
+func TestFile(t *testing.T) {
+	//fmt.Println(rand.Int63n(100))
+	//fmt.Println(rand.Int63n(100))
+	//fmt.Println(rand.Int63n(100))
+	//fmt.Println(rand.Int63n(100))
+	//fmt.Println(rand.Int63n(100))
+	//fmt.Println(rand.Int63n(100))
+	//fmt.Println(rand.Int63n(100))
+	//fmt.Println(rand.Int63n(100))
+
+}
+
+func getTableName(fileName string) string {
+	if fileName == "" {
+		return ""
+	}
+
+	lastIndex := strings.LastIndex(fileName, "_")
+	if lastIndex <= -1 {
+		return ""
+	}
+
+	return fileName[:lastIndex]
+}
