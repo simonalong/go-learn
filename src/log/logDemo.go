@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/simonalong/gole/log"
 	"github.com/sirupsen/logrus"
 	"time"
 )
